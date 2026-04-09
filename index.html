@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATS PRO FINAL</title>
+<title>ATS PRO</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -38,19 +38,15 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-button:hover{opacity:0.9}
+button:disabled{
+  opacity:0.5;
+}
 </style>
 </head>
 
 <body>
 
-<h2>ATS PRO (FUNCIONANDO)</h2>
-
-<div class="section">
-  <h3>Cargar ATS base manual (opcional)</h3>
-  <input type="file" id="fileBase" accept=".xlsx">
-  <button onclick="cargarArchivo()">Cargar archivo</button>
-</div>
+<h2>ATS PRO</h2>
 
 <div class="section">
 <h3>Información General</h3>
@@ -80,7 +76,7 @@ button:hover{opacity:0.9}
 <div id="workers"></div>
 </div>
 
-<button onclick="generarATS()">Generar ATS</button>
+<button onclick="generarATS(event)">Generar ATS</button>
 
 <script>
 
@@ -88,6 +84,7 @@ const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTz
 
 const workersDiv = document.getElementById('workers');
 
+// crear inputs
 function crearWorkers(lista=[]){
   workersDiv.innerHTML='';
   for(let i=0;i<11;i++){
@@ -101,7 +98,7 @@ function crearWorkers(lista=[]){
 
 function get(id){return document.getElementById(id).value}
 
-// 🔥 LLENAR FORMULARIO
+// cargar datos desde excel
 function llenarFormulario(ws){
 
   const getCell = c => ws[c] ? ws[c].v : '';
@@ -136,42 +133,20 @@ function llenarFormulario(ws){
   crearWorkers(workers);
 }
 
-// 🔥 CARGA AUTOMÁTICA DESDE GITHUB
+// auto cargar base
 async function cargarBaseAuto(){
   try{
-
-    const res = await fetch('./ATS_Abril_2026.xlsx'); // ← CORRECTO
-    if(!res.ok) throw new Error("No encontrado");
-
+    const res = await fetch('./ATS_Abril_2026.xlsx');
     const buffer = await res.arrayBuffer();
     const wb = XLSX.read(buffer,{type:'array'});
     const ws = wb.Sheets[wb.SheetNames[0]];
-
     llenarFormulario(ws);
-
-    console.log("✔ ATS cargado automático");
-
   }catch(e){
-    console.warn("⚠ No cargó automático:", e.message);
+    console.warn("No cargó automático");
   }
 }
 
-// 🔥 CARGA MANUAL
-function cargarArchivo(){
-  const file = document.getElementById('fileBase').files[0];
-  if(!file) return alert("Selecciona archivo");
-
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data,{type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    llenarFormulario(ws);
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-// 🔥 RECOLECTAR DATOS
+// recolectar datos
 function collect(){
 
   let workers=[];
@@ -198,20 +173,43 @@ function collect(){
   };
 }
 
-// 🔥 ENVIAR A APPS SCRIPT
-async function generarATS(){
+// 🔥 GENERAR ATS (PRO)
+async function generarATS(event){
 
   const data = collect();
 
-  const response = await fetch(URL_BACKEND, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  if(!data.lugar || !data.tipo_trabajo){
+    alert("Faltan datos obligatorios");
+    return;
+  }
 
-  const result = await response.json();
+  const btn = event.target;
+  btn.innerText = "Generando...";
+  btn.disabled = true;
 
-  alert("ATS generado correctamente");
-  window.open(result.url, "_blank");
+  try{
+
+    const response = await fetch(URL_BACKEND, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    alert("LISTO MIGUELITO 🚀");
+
+    window.open(result.url, "_blank");
+
+  }catch(error){
+    alert("Error generando ATS");
+    console.error(error);
+  }
+
+  btn.innerText = "Generar ATS";
+  btn.disabled = false;
 }
 
 // INIT
