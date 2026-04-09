@@ -2,118 +2,150 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS INTERACTIVO REAL</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<title>ATS PRO FINAL</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;padding:20px}
-#excel{background:#fff;padding:10px;border-radius:10px;overflow:auto}
-td{border:1px solid #000;min-width:80px;height:25px;font-size:11px;padding:2px;cursor:pointer}
-input{width:100%;border:none;outline:none}
-button{margin-top:15px;padding:12px;background:#22c55e;border:none;border-radius:8px}
+body{
+  font-family: Arial;
+  background:#0f172a;
+  color:#fff;
+  padding:20px;
+}
+.section{
+  background:#1e293b;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+}
+input,textarea{
+  width:100%;
+  margin:5px 0;
+  padding:10px;
+  background:#334155;
+  color:#fff;
+  border:none;
+}
+button{
+  padding:12px;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+}
 </style>
 </head>
 
 <body>
 
-<h2 style="color:white">ATS REAL PRELLENADO</h2>
+<h2>ATS PRO</h2>
 
-<div id="excel"></div>
+<div class="section">
+<h3>Información General</h3>
+<input id="fecha_inicio">
+<input id="fecha_fin">
+<input id="lugar">
+<textarea id="tipo_trabajo"></textarea>
+</div>
 
-<button onclick="enviar()">Generar ATS</button>
+<div class="section">
+<h3>ATS</h3>
+<textarea id="pasos"></textarea>
+<textarea id="maquinas"></textarea>
+<textarea id="peligros"></textarea>
+<textarea id="controles"></textarea>
+</div>
+
+<div class="section">
+<h3>Herramientas</h3>
+<input id="manuales">
+<input id="electricas">
+<input id="otros">
+</div>
+
+<div class="section">
+<h3>Observaciones</h3>
+<textarea id="observaciones"></textarea>
+</div>
+
+<div class="section">
+<h3>Trabajadores</h3>
+<div id="workers"></div>
+</div>
+
+<button onclick="generarATS()">Generar ATS</button>
 
 <script>
 
-const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+const URL = "TU_URL_WEBAPP"; // tu apps script
 
-let changes = {};
-let plantilla;
-let datos;
-
-// 🔥 CARGAR AMBOS ARCHIVOS
-async function cargar(){
-
-  const resPlantilla = await fetch('./ATS.xlsx');
-  const resDatos = await fetch('./ATS_Abril_2026.xlsx');
-
-  const buf1 = await resPlantilla.arrayBuffer();
-  const buf2 = await resDatos.arrayBuffer();
-
-  const wb1 = XLSX.read(buf1,{type:'array'});
-  const wb2 = XLSX.read(buf2,{type:'array'});
-
-  plantilla = wb1.Sheets[wb1.SheetNames[0]];
-  datos = wb2.Sheets[wb2.SheetNames[0]];
-
-  render();
+function crearWorkers(lista=[]){
+  let html="";
+  for(let i=0;i<10;i++){
+    let w = lista[i] || {};
+    html += `
+      <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
+      <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
+    `;
+  }
+  document.getElementById("workers").innerHTML = html;
 }
 
-// 🔥 RENDER CON DATOS REALES
-function render(){
+// 🔥 CARGAR DATOS BASE DESDE APPS SCRIPT
+async function cargarBase(){
 
-  const range = XLSX.utils.decode_range(plantilla['!ref']);
-  let html = "<table>";
+  const res = await fetch(URL + "?getBase=1");
+  const data = await res.json();
 
-  for(let R=range.s.r; R<=range.e.r; R++){
-    html += "<tr>";
+  fecha_inicio.value = data.fecha_inicio || "";
+  fecha_fin.value = data.fecha_fin || "";
+  lugar.value = data.lugar || "";
+  tipo_trabajo.value = data.tipo_trabajo || "";
 
-    for(let C=range.s.c; C<=range.e.c; C++){
+  pasos.value = data.pasos || "";
+  maquinas.value = data.maquinas || "";
+  peligros.value = data.peligros || "";
+  controles.value = data.controles || "";
 
-      const ref = XLSX.utils.encode_cell({r:R,c:C});
+  manuales.value = data.manuales || "";
+  electricas.value = data.electricas || "";
+  otros.value = data.otros || "";
 
-      // 🔥 USAR DATOS DE ABRIL
-      let value = datos[ref] ? datos[ref].v : "";
+  observaciones.value = data.observaciones || "";
 
-      html += `<td data-cell="${ref}">${value || ""}</td>`;
-    }
+  crearWorkers(data.workers || []);
+}
 
-    html += "</tr>";
+// 🔥 ENVIAR
+async function generarATS(){
+
+  const workers = [];
+
+  for(let i=0;i<10;i++){
+    workers.push({
+      nombre:document.getElementById("n_"+i).value,
+      cedula:document.getElementById("c_"+i).value
+    });
   }
 
-  html += "</table>";
+  const data = {
+    fecha_inicio:fecha_inicio.value,
+    fecha_fin:fecha_fin.value,
+    lugar:lugar.value,
+    tipo_trabajo:tipo_trabajo.value,
+    pasos:pasos.value,
+    maquinas:maquinas.value,
+    peligros:peligros.value,
+    controles:controles.value,
+    manuales:manuales.value,
+    electricas:electricas.value,
+    otros:otros.value,
+    observaciones:observaciones.value,
+    workers
+  };
 
-  document.getElementById("excel").innerHTML = html;
-
-  activarEdicion();
-}
-
-// 🔥 EDICIÓN
-function activarEdicion(){
-
-  document.querySelectorAll("td").forEach(td=>{
-
-    td.onclick = () => {
-
-      if(td.querySelector("input")) return;
-
-      const val = td.innerText;
-
-      td.innerHTML = `<input value="${val}">`;
-      const input = td.querySelector("input");
-
-      input.focus();
-
-      input.onblur = () => {
-
-        td.innerText = input.value;
-
-        const cell = td.dataset.cell;
-        changes[cell] = input.value;
-      };
-    };
-
-  });
-
-}
-
-// 🔥 ENVIAR CAMBIOS
-async function enviar(){
-
-  const res = await fetch(URL_BACKEND,{
+  const res = await fetch(URL,{
     method:"POST",
-    headers:{"Content-Type":"text/plain"},
-    body: JSON.stringify({changes})
+    body: JSON.stringify(data)
   });
 
   const r = await res.json();
@@ -122,7 +154,7 @@ async function enviar(){
   window.open(r.url);
 }
 
-cargar();
+cargarBase();
 
 </script>
 
