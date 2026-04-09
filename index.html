@@ -44,9 +44,8 @@ button:hover{opacity:0.9}
 
 <body>
 
-<h2>ATS PRO (APPS SCRIPT)</h2>
+<h2>ATS PRO (FUNCIONANDO)</h2>
 
-<!-- 🔥 FALLBACK -->
 <div class="section">
   <h3>Cargar ATS base manual (opcional)</h3>
   <input type="file" id="fileBase" accept=".xlsx">
@@ -81,16 +80,14 @@ button:hover{opacity:0.9}
 <div id="workers"></div>
 </div>
 
-<button onclick="generarATS()">Generar ATS en Drive</button>
+<button onclick="generarATS()">Generar ATS</button>
 
 <script>
 
-// 🔥 TU URL DE APPS SCRIPT
 const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
 const workersDiv = document.getElementById('workers');
 
-// crear inputs siempre
 function crearWorkers(lista=[]){
   workersDiv.innerHTML='';
   for(let i=0;i<11;i++){
@@ -104,8 +101,9 @@ function crearWorkers(lista=[]){
 
 function get(id){return document.getElementById(id).value}
 
-// llenar formulario desde excel
+// 🔥 LLENAR FORMULARIO
 function llenarFormulario(ws){
+
   const getCell = c => ws[c] ? ws[c].v : '';
 
   document.getElementById('fecha_inicio').value = getCell('J4');
@@ -138,10 +136,11 @@ function llenarFormulario(ws){
   crearWorkers(workers);
 }
 
-// 🔥 AUTO LOAD DESDE GITHUB
+// 🔥 CARGA AUTOMÁTICA DESDE GITHUB
 async function cargarBaseAuto(){
   try{
-    const res = await fetch('./ATS_abril_2026.xlsx');
+
+    const res = await fetch('./ATS_Abril_2026.xlsx'); // ← CORRECTO
     if(!res.ok) throw new Error("No encontrado");
 
     const buffer = await res.arrayBuffer();
@@ -153,11 +152,11 @@ async function cargarBaseAuto(){
     console.log("✔ ATS cargado automático");
 
   }catch(e){
-    console.warn("⚠ No cargó automático");
+    console.warn("⚠ No cargó automático:", e.message);
   }
 }
 
-// 🔥 MANUAL
+// 🔥 CARGA MANUAL
 function cargarArchivo(){
   const file = document.getElementById('fileBase').files[0];
   if(!file) return alert("Selecciona archivo");
@@ -172,7 +171,7 @@ function cargarArchivo(){
   reader.readAsArrayBuffer(file);
 }
 
-// recolectar datos
+// 🔥 RECOLECTAR DATOS
 function collect(){
 
   let workers=[];
@@ -199,7 +198,7 @@ function collect(){
   };
 }
 
-// 🔥 ENVÍO AL BACKEND
+// 🔥 ENVIAR A APPS SCRIPT
 async function generarATS(){
 
   const data = collect();
