@@ -3,55 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATS PRO AUTO FULL</title>
+<title>ATS PRO VISUAL</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-body{font-family:Arial;padding:20px;background:#111;color:#eee}
-input,textarea{width:100%;margin:5px 0;padding:8px}
-button{padding:10px 20px;margin-top:10px}
+body{font-family:Arial;padding:20px;background:#0f172a;color:#e2e8f0}
+.section{border:1px solid #334155;padding:15px;margin-bottom:15px;border-radius:10px;background:#1e293b}
+h3{margin-top:0}
+input,textarea{width:100%;margin:5px 0;padding:8px;border-radius:6px;border:none;background:#334155;color:#fff}
+button{padding:12px 20px;margin-top:15px;background:#22c55e;border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer}
+button:hover{opacity:0.9}
 </style>
 </head>
 <body>
 
-<h2>ATS PRO (AUTO COMPLETO DESDE ATS_ABRIL_2026)</h2>
+<h2>ATS PRO (VISUAL + EDITABLE)</h2>
 
+<div class="section">
+<h3>Información General</h3>
 <label>Fecha inicio</label>
 <input type="date" id="fecha_inicio">
-
 <label>Fecha fin</label>
 <input type="date" id="fecha_fin">
-
 <label>Lugar</label>
-<input type="text" id="lugar">
-
+<input id="lugar">
 <label>Tipo de trabajo</label>
 <textarea id="tipo_trabajo"></textarea>
+</div>
 
+<div class="section">
+<h3>ATS</h3>
 <label>Pasos</label>
 <textarea id="pasos"></textarea>
-
 <label>Máquinas</label>
 <textarea id="maquinas"></textarea>
-
 <label>Peligros</label>
 <textarea id="peligros"></textarea>
-
 <label>Controles</label>
 <textarea id="controles_ats"></textarea>
+</div>
 
-<label>Herramientas manuales</label>
+<div class="section">
+<h3>Herramientas</h3>
+<label>Manuales</label>
 <input id="h_manuales">
-
-<label>Herramientas eléctricas</label>
+<label>Eléctricas</label>
 <input id="h_electricas">
-
-<label>Observaciones herramientas</label>
+<label>Observaciones</label>
 <textarea id="obs_herramientas"></textarea>
+</div>
 
-<h3>Trabajadores (AUTO)</h3>
+<div class="section">
+<h3>Trabajadores (editable)</h3>
 <div id="workers"></div>
+</div>
 
-<button onclick="descargar()">Descargar ATS</button>
+<button onclick="descargar()">Generar ATS</button>
 
 <script>
 
@@ -62,8 +68,10 @@ function crearWorkers(lista=[]){
   for(let i=0;i<11;i++){
     const w = lista[i] || {nombre:'',cedula:''};
     workersDiv.innerHTML += `
-      <input placeholder="Nombre" id="n_${i}" value="${w.nombre||''}">
-      <input placeholder="Cédula" id="c_${i}" value="${w.cedula||''}">
+      <div style="margin-bottom:10px">
+        <input placeholder="Nombre" id="n_${i}" value="${w.nombre||''}">
+        <input placeholder="Cédula" id="c_${i}" value="${w.cedula||''}">
+      </div>
     `;
   }
 }
@@ -95,7 +103,6 @@ function collect(){
   }
 }
 
-// 🔥 CARGA COMPLETA DESDE ATS_ABRIL
 async function cargarBase(){
   const res = await fetch('ATS_abril_2026.xlsx');
   const buffer = await res.arrayBuffer();
@@ -104,24 +111,20 @@ async function cargarBase(){
 
   const getCell = c => ws[c] ? ws[c].v : '';
 
-  // GENERALES
   document.getElementById('fecha_inicio').value = getCell('J4');
   document.getElementById('fecha_fin').value = getCell('O4');
   document.getElementById('lugar').value = getCell('T4');
   document.getElementById('tipo_trabajo').value = (getCell('A5')||'').replace('TIPO DE TRABAJO: ','');
 
-  // ATS
   document.getElementById('pasos').value = getCell('A8');
   document.getElementById('maquinas').value = getCell('F8');
   document.getElementById('peligros').value = getCell('H8');
   document.getElementById('controles_ats').value = getCell('O8');
 
-  // HERRAMIENTAS
   document.getElementById('h_manuales').value = getCell('F21');
   document.getElementById('h_electricas').value = getCell('F22');
   document.getElementById('obs_herramientas').value = getCell('S21');
 
-  // TRABAJADORES
   let workers=[];
   for(let i=0;i<11;i++){
     let row = 85+i;
@@ -136,7 +139,6 @@ async function cargarBase(){
   crearWorkers(workers);
 }
 
-// GENERAR DESDE PLANTILLA
 async function generar(data){
   const res = await fetch('ATS.xlsx');
   const buffer = await res.arrayBuffer();
