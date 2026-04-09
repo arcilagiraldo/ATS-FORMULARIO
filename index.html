@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATS PRO</title>
+<title>ATS PRO AUTO FULL</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 body{font-family:Arial;padding:20px;background:#111;color:#eee}
@@ -13,7 +13,7 @@ button{padding:10px 20px;margin-top:10px}
 </head>
 <body>
 
-<h2>ATS PRO (Plantilla real)</h2>
+<h2>ATS PRO (AUTO COMPLETO DESDE ATS_ABRIL_2026)</h2>
 
 <label>Fecha inicio</label>
 <input type="date" id="fecha_inicio">
@@ -22,10 +22,10 @@ button{padding:10px 20px;margin-top:10px}
 <input type="date" id="fecha_fin">
 
 <label>Lugar</label>
-<input type="text" id="lugar" value="Obra Norte - Antioquia">
+<input type="text" id="lugar">
 
 <label>Tipo de trabajo</label>
-<textarea id="tipo_trabajo">Obra civil</textarea>
+<textarea id="tipo_trabajo"></textarea>
 
 <label>Pasos</label>
 <textarea id="pasos"></textarea>
@@ -39,7 +39,16 @@ button{padding:10px 20px;margin-top:10px}
 <label>Controles</label>
 <textarea id="controles_ats"></textarea>
 
-<h3>Trabajadores</h3>
+<label>Herramientas manuales</label>
+<input id="h_manuales">
+
+<label>Herramientas eléctricas</label>
+<input id="h_electricas">
+
+<label>Observaciones herramientas</label>
+<textarea id="obs_herramientas"></textarea>
+
+<h3>Trabajadores (AUTO)</h3>
 <div id="workers"></div>
 
 <button onclick="descargar()">Descargar ATS</button>
@@ -47,18 +56,23 @@ button{padding:10px 20px;margin-top:10px}
 <script>
 
 const workersDiv = document.getElementById('workers');
-for(let i=0;i<5;i++){
-  workersDiv.innerHTML += `
-    <input placeholder="Nombre" id="n_${i}">
-    <input placeholder="Cédula" id="c_${i}">
-  `;
+
+function crearWorkers(lista=[]){
+  workersDiv.innerHTML='';
+  for(let i=0;i<11;i++){
+    const w = lista[i] || {nombre:'',cedula:''};
+    workersDiv.innerHTML += `
+      <input placeholder="Nombre" id="n_${i}" value="${w.nombre||''}">
+      <input placeholder="Cédula" id="c_${i}" value="${w.cedula||''}">
+    `;
+  }
 }
 
 function get(id){return document.getElementById(id).value}
 
 function collect(){
   let workers=[];
-  for(let i=0;i<5;i++){
+  for(let i=0;i<11;i++){
     workers.push({
       nombre:get('n_'+i),
       cedula:get('c_'+i)
@@ -74,14 +88,59 @@ function collect(){
     maquinas:get('maquinas'),
     peligros:get('peligros'),
     controles_ats:get('controles_ats'),
+    h_manuales:get('h_manuales'),
+    h_electricas:get('h_electricas'),
+    obs_herramientas:get('obs_herramientas'),
     workers
   }
 }
 
+// 🔥 CARGA COMPLETA DESDE ATS_ABRIL
+async function cargarBase(){
+  const res = await fetch('ATS_abril_2026.xlsx');
+  const buffer = await res.arrayBuffer();
+  const wb = XLSX.read(buffer,{type:'array'});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+
+  const getCell = c => ws[c] ? ws[c].v : '';
+
+  // GENERALES
+  document.getElementById('fecha_inicio').value = getCell('J4');
+  document.getElementById('fecha_fin').value = getCell('O4');
+  document.getElementById('lugar').value = getCell('T4');
+  document.getElementById('tipo_trabajo').value = (getCell('A5')||'').replace('TIPO DE TRABAJO: ','');
+
+  // ATS
+  document.getElementById('pasos').value = getCell('A8');
+  document.getElementById('maquinas').value = getCell('F8');
+  document.getElementById('peligros').value = getCell('H8');
+  document.getElementById('controles_ats').value = getCell('O8');
+
+  // HERRAMIENTAS
+  document.getElementById('h_manuales').value = getCell('F21');
+  document.getElementById('h_electricas').value = getCell('F22');
+  document.getElementById('obs_herramientas').value = getCell('S21');
+
+  // TRABAJADORES
+  let workers=[];
+  for(let i=0;i<11;i++){
+    let row = 85+i;
+    let nombre = getCell('B'+row);
+    let cedula = getCell('L'+row);
+
+    if(nombre || cedula){
+      workers.push({nombre,cedula});
+    }
+  }
+
+  crearWorkers(workers);
+}
+
+// GENERAR DESDE PLANTILLA
 async function generar(data){
   const res = await fetch('ATS.xlsx');
   const buffer = await res.arrayBuffer();
-  const wb = XLSX.read(buffer, {type:'array'});
+  const wb = XLSX.read(buffer,{type:'array'});
   const ws = wb.Sheets[wb.SheetNames[0]];
 
   const set = (c,v)=>{ if(!ws[c]) ws[c]={}; ws[c].v=v; ws[c].t='s'; }
@@ -95,6 +154,10 @@ async function generar(data){
   set('F8', data.maquinas);
   set('H8', data.peligros);
   set('O8', data.controles_ats);
+
+  set('F21', data.h_manuales);
+  set('F22', data.h_electricas);
+  set('S21', data.obs_herramientas);
 
   data.workers.forEach((w,i)=>{
     let r=85+i;
@@ -110,6 +173,8 @@ async function descargar(){
   const wb = await generar(data);
   XLSX.writeFile(wb,'ATS_generado.xlsx');
 }
+
+cargarBase();
 
 </script>
 
