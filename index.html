@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATS PRO</title>
+<title>ATS INTERACTIVO PRO</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -11,186 +10,150 @@
 body{
   font-family: Arial;
   background:#0f172a;
-  color:#e2e8f0;
   padding:20px;
 }
-.section{
-  background:#1e293b;
-  padding:15px;
-  margin-bottom:15px;
+
+#excel{
+  background:#fff;
+  overflow:auto;
   border-radius:10px;
+  padding:10px;
 }
-input, textarea{
+
+td{
+  border:1px solid #000;
+  min-width:80px;
+  height:25px;
+  font-size:11px;
+  padding:2px;
+  cursor:pointer;
+}
+
+td.active{
+  outline:2px solid #22c55e;
+}
+
+input.cell-edit{
   width:100%;
-  margin:5px 0;
-  padding:8px;
-  border-radius:6px;
+  height:100%;
   border:none;
-  background:#334155;
-  color:#fff;
+  outline:none;
 }
 button{
-  padding:12px 20px;
-  margin-top:10px;
+  margin-top:15px;
+  padding:12px;
   background:#22c55e;
   border:none;
   border-radius:8px;
   font-weight:bold;
-  cursor:pointer;
-}
-.hidden{display:none}
-.preview{
-  background:#020617;
-  padding:20px;
-  border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>ATS PRO</h2>
+<h2 style="color:white">ATS INTERACTIVO</h2>
 
-<div id="formulario">
+<div id="excel"></div>
 
-<div class="section">
-<h3>Información General</h3>
-<input type="date" id="fecha_inicio">
-<input type="date" id="fecha_fin">
-<input id="lugar" placeholder="Lugar">
-<textarea id="tipo_trabajo" placeholder="Tipo trabajo"></textarea>
-</div>
-
-<div class="section">
-<h3>ATS</h3>
-<textarea id="pasos"></textarea>
-<textarea id="maquinas"></textarea>
-<textarea id="peligros"></textarea>
-<textarea id="controles_ats"></textarea>
-</div>
-
-<div class="section">
-<h3>Herramientas</h3>
-<input id="h_manuales">
-<input id="h_electricas">
-<textarea id="obs_herramientas"></textarea>
-</div>
-
-<div class="section">
-<h3>Trabajadores</h3>
-<div id="workers"></div>
-</div>
-
-<button onclick="mostrarPreview()">Revisar antes de enviar</button>
-
-</div>
-
-<!-- 🔥 PREVIEW -->
-<div id="preview" class="hidden preview"></div>
+<button onclick="enviar()">Generar ATS</button>
 
 <script>
 
 const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-const workersDiv = document.getElementById('workers');
+let sheetData = {};
+let worksheet;
 
-function crearWorkers(lista=[]){
-  workersDiv.innerHTML='';
-  for(let i=0;i<11;i++){
-    const w = lista[i] || {};
-    workersDiv.innerHTML += `
-      <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
-      <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
-    `;
-  }
+// 🔥 CARGAR EXCEL
+async function cargar(){
+
+  const res = await fetch('./ATS.xlsx');
+  const buffer = await res.arrayBuffer();
+
+  const wb = XLSX.read(buffer,{type:'array'});
+  worksheet = wb.Sheets[wb.SheetNames[0]];
+
+  render();
 }
 
-function get(id){return document.getElementById(id).value}
+// 🔥 RENDER REAL
+function render(){
 
-function collect(){
-  let workers=[];
-  for(let i=0;i<11;i++){
-    workers.push({
-      nombre:get('n_'+i),
-      cedula:get('c_'+i)
+  const range = XLSX.utils.decode_range(worksheet['!ref']);
+  let html = "<table>";
+
+  for(let R=range.s.r; R<=range.e.r; ++R){
+    html += "<tr>";
+
+    for(let C=range.s.c; C<=range.e.c; ++C){
+
+      const cellRef = XLSX.utils.encode_cell({r:R,c:C});
+      const cell = worksheet[cellRef];
+
+      let value = cell ? cell.v : "";
+
+      html += `<td data-cell="${cellRef}">${value || ""}</td>`;
+    }
+
+    html += "</tr>";
+  }
+
+  html += "</table>";
+
+  document.getElementById("excel").innerHTML = html;
+
+  activarEdicion();
+}
+
+// 🔥 EDICIÓN TIPO EXCEL
+function activarEdicion(){
+
+  document.querySelectorAll("td").forEach(td=>{
+
+    td.addEventListener("click",()=>{
+
+      if(td.querySelector("input")) return;
+
+      const value = td.innerText;
+      td.classList.add("active");
+
+      td.innerHTML = `<input class="cell-edit" value="${value}">`;
+
+      const input = td.querySelector("input");
+      input.focus();
+
+      input.addEventListener("blur",()=>{
+        const newVal = input.value;
+        td.innerText = newVal;
+        td.classList.remove("active");
+
+        const cell = td.dataset.cell;
+        sheetData[cell] = newVal;
+      });
+
     });
-  }
 
-  return {
-    fecha_inicio:get('fecha_inicio'),
-    fecha_fin:get('fecha_fin'),
-    lugar:get('lugar'),
-    tipo_trabajo:get('tipo_trabajo'),
-    pasos:get('pasos'),
-    maquinas:get('maquinas'),
-    peligros:get('peligros'),
-    controles_ats:get('controles_ats'),
-    h_manuales:get('h_manuales'),
-    h_electricas:get('h_electricas'),
-    obs_herramientas:get('obs_herramientas'),
-    workers
-  };
-}
-
-// 🔥 PREVIEW
-function mostrarPreview(){
-
-  const data = collect();
-
-  let html = `
-  <h3>Resumen ATS</h3>
-
-  <b>Fecha:</b> ${data.fecha_inicio} - ${data.fecha_fin}<br>
-  <b>Lugar:</b> ${data.lugar}<br>
-  <b>Trabajo:</b> ${data.tipo_trabajo}<br><br>
-
-  <b>Pasos:</b><br>${data.pasos}<br><br>
-  <b>Máquinas:</b><br>${data.maquinas}<br><br>
-  <b>Peligros:</b><br>${data.peligros}<br><br>
-  <b>Controles:</b><br>${data.controles_ats}<br><br>
-
-  <b>Herramientas:</b><br>
-  ${data.h_manuales}<br>
-  ${data.h_electricas}<br>
-  ${data.obs_herramientas}<br><br>
-
-  <b>Trabajadores:</b><br>
-  ${data.workers.map(w=>`${w.nombre} - ${w.cedula}`).join("<br>")}
-  <br><br>
-
-  <button onclick="volver()">✏️ Editar</button>
-  <button onclick="enviarFinal()">🚀 Confirmar y enviar</button>
-  `;
-
-  document.getElementById('preview').innerHTML = html;
-  document.getElementById('formulario').classList.add('hidden');
-  document.getElementById('preview').classList.remove('hidden');
-}
-
-function volver(){
-  document.getElementById('formulario').classList.remove('hidden');
-  document.getElementById('preview').classList.add('hidden');
-}
-
-// 🔥 ENVÍO FINAL
-async function enviarFinal(){
-
-  const data = collect();
-
-  const response = await fetch(URL_BACKEND, {
-    method: "POST",
-    headers: {"Content-Type":"text/plain"},
-    body: JSON.stringify(data)
   });
 
-  const result = await response.json();
-
-  alert("LISTO MIGUELITO 🚀");
-  window.open(result.url, "_blank");
 }
 
-// INIT
-crearWorkers();
+// 🔥 ENVIAR CAMBIOS
+async function enviar(){
+
+  const res = await fetch(URL_BACKEND,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain"},
+    body: JSON.stringify({changes: sheetData})
+  });
+
+  const r = await res.json();
+
+  alert("LISTO MIGUELITO 🚀");
+  window.open(r.url);
+}
+
+cargar();
 
 </script>
 
