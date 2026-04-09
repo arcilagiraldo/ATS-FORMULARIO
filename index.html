@@ -38,16 +38,17 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
+button:hover{opacity:0.9}
 </style>
 </head>
 
 <body>
 
-<h2>ATS PRO (AUTO + EDITABLE)</h2>
+<h2>ATS PRO (APPS SCRIPT)</h2>
 
 <!-- 🔥 FALLBACK -->
 <div class="section">
-  <h3>Cargar ATS base manual (si no carga automático)</h3>
+  <h3>Cargar ATS base manual (opcional)</h3>
   <input type="file" id="fileBase" accept=".xlsx">
   <button onclick="cargarArchivo()">Cargar archivo</button>
 </div>
@@ -80,12 +81,16 @@ button{
 <div id="workers"></div>
 </div>
 
-<button onclick="descargar()">Generar ATS</button>
+<button onclick="generarATS()">Generar ATS en Drive</button>
 
 <script>
 
+// 🔥 TU URL DE APPS SCRIPT
+const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+
 const workersDiv = document.getElementById('workers');
 
+// crear inputs siempre
 function crearWorkers(lista=[]){
   workersDiv.innerHTML='';
   for(let i=0;i<11;i++){
@@ -99,11 +104,9 @@ function crearWorkers(lista=[]){
 
 function get(id){return document.getElementById(id).value}
 
+// llenar formulario desde excel
 function llenarFormulario(ws){
-
   const getCell = c => ws[c] ? ws[c].v : '';
-
-  console.log("Cargando datos...");
 
   document.getElementById('fecha_inicio').value = getCell('J4');
   document.getElementById('fecha_fin').value = getCell('O4');
@@ -139,7 +142,7 @@ function llenarFormulario(ws){
 async function cargarBaseAuto(){
   try{
     const res = await fetch('./ATS_abril_2026.xlsx');
-    if(!res.ok) throw new Error("No encontró archivo");
+    if(!res.ok) throw new Error("No encontrado");
 
     const buffer = await res.arrayBuffer();
     const wb = XLSX.read(buffer,{type:'array'});
@@ -150,7 +153,7 @@ async function cargarBaseAuto(){
     console.log("✔ ATS cargado automático");
 
   }catch(e){
-    console.warn("⚠ No cargó automático:", e.message);
+    console.warn("⚠ No cargó automático");
   }
 }
 
@@ -169,42 +172,52 @@ function cargarArchivo(){
   reader.readAsArrayBuffer(file);
 }
 
-// 🔥 GENERAR ATS FINAL
-async function descargar(){
+// recolectar datos
+function collect(){
 
-  const res = await fetch('./ATS.xlsx');
-  const buffer = await res.arrayBuffer();
-  const wb = XLSX.read(buffer,{type:'array'});
-  const ws = wb.Sheets[wb.SheetNames[0]];
-
-  const set = (c,v)=>{ if(!ws[c]) ws[c]={}; ws[c].v=v; ws[c].t='s'; }
-
-  set('J4', get('fecha_inicio'));
-  set('O4', get('fecha_fin'));
-  set('T4', get('lugar'));
-  set('A5', 'TIPO DE TRABAJO: '+get('tipo_trabajo'));
-
-  set('A8', get('pasos'));
-  set('F8', get('maquinas'));
-  set('H8', get('peligros'));
-  set('O8', get('controles_ats'));
-
-  set('F21', get('h_manuales'));
-  set('F22', get('h_electricas'));
-  set('S21', get('obs_herramientas'));
-
+  let workers=[];
   for(let i=0;i<11;i++){
-    let r=85+i;
-    set('B'+r, get('n_'+i));
-    set('L'+r, get('c_'+i));
+    workers.push({
+      nombre:get('n_'+i),
+      cedula:get('c_'+i)
+    });
   }
 
-  XLSX.writeFile(wb,'ATS_generado.xlsx');
+  return {
+    fecha_inicio:get('fecha_inicio'),
+    fecha_fin:get('fecha_fin'),
+    lugar:get('lugar'),
+    tipo_trabajo:get('tipo_trabajo'),
+    pasos:get('pasos'),
+    maquinas:get('maquinas'),
+    peligros:get('peligros'),
+    controles_ats:get('controles_ats'),
+    h_manuales:get('h_manuales'),
+    h_electricas:get('h_electricas'),
+    obs_herramientas:get('obs_herramientas'),
+    workers
+  };
+}
+
+// 🔥 ENVÍO AL BACKEND
+async function generarATS(){
+
+  const data = collect();
+
+  const response = await fetch(URL_BACKEND, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  alert("ATS generado correctamente");
+  window.open(result.url, "_blank");
 }
 
 // INIT
-cargarBaseAuto();
 crearWorkers();
+cargarBaseAuto();
 
 </script>
 
