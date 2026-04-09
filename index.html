@@ -38,8 +38,11 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-button:disabled{
-  opacity:0.5;
+.hidden{display:none}
+.preview{
+  background:#020617;
+  padding:20px;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -47,6 +50,8 @@ button:disabled{
 <body>
 
 <h2>ATS PRO</h2>
+
+<div id="formulario">
 
 <div class="section">
 <h3>Información General</h3>
@@ -58,17 +63,17 @@ button:disabled{
 
 <div class="section">
 <h3>ATS</h3>
-<textarea id="pasos" placeholder="Pasos"></textarea>
-<textarea id="maquinas" placeholder="Máquinas"></textarea>
-<textarea id="peligros" placeholder="Peligros"></textarea>
-<textarea id="controles_ats" placeholder="Controles"></textarea>
+<textarea id="pasos"></textarea>
+<textarea id="maquinas"></textarea>
+<textarea id="peligros"></textarea>
+<textarea id="controles_ats"></textarea>
 </div>
 
 <div class="section">
 <h3>Herramientas</h3>
-<input id="h_manuales" placeholder="Manuales">
-<input id="h_electricas" placeholder="Eléctricas">
-<textarea id="obs_herramientas" placeholder="Observaciones"></textarea>
+<input id="h_manuales">
+<input id="h_electricas">
+<textarea id="obs_herramientas"></textarea>
 </div>
 
 <div class="section">
@@ -76,7 +81,12 @@ button:disabled{
 <div id="workers"></div>
 </div>
 
-<button onclick="generarATS(event)">Generar ATS</button>
+<button onclick="mostrarPreview()">Revisar antes de enviar</button>
+
+</div>
+
+<!-- 🔥 PREVIEW -->
+<div id="preview" class="hidden preview"></div>
 
 <script>
 
@@ -84,11 +94,10 @@ const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTz
 
 const workersDiv = document.getElementById('workers');
 
-// crear inputs
 function crearWorkers(lista=[]){
   workersDiv.innerHTML='';
   for(let i=0;i<11;i++){
-    const w = lista[i] || {nombre:'',cedula:''};
+    const w = lista[i] || {};
     workersDiv.innerHTML += `
       <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
       <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
@@ -98,57 +107,7 @@ function crearWorkers(lista=[]){
 
 function get(id){return document.getElementById(id).value}
 
-// cargar datos desde excel
-function llenarFormulario(ws){
-
-  const getCell = c => ws[c] ? ws[c].v : '';
-
-  document.getElementById('fecha_inicio').value = getCell('J4');
-  document.getElementById('fecha_fin').value = getCell('O4');
-  document.getElementById('lugar').value = getCell('T4');
-
-  document.getElementById('tipo_trabajo').value =
-    (getCell('A5')||'').replace('TIPO DE TRABAJO: ','');
-
-  document.getElementById('pasos').value = getCell('A8');
-  document.getElementById('maquinas').value = getCell('F8');
-  document.getElementById('peligros').value = getCell('H8');
-  document.getElementById('controles_ats').value = getCell('O8');
-
-  document.getElementById('h_manuales').value = getCell('F21');
-  document.getElementById('h_electricas').value = getCell('F22');
-  document.getElementById('obs_herramientas').value = getCell('S21');
-
-  let workers=[];
-  for(let i=0;i<11;i++){
-    let row = 85+i;
-    let nombre = getCell('B'+row);
-    let cedula = getCell('L'+row);
-
-    if(nombre || cedula){
-      workers.push({nombre,cedula});
-    }
-  }
-
-  crearWorkers(workers);
-}
-
-// auto cargar base
-async function cargarBaseAuto(){
-  try{
-    const res = await fetch('./ATS_Abril_2026.xlsx');
-    const buffer = await res.arrayBuffer();
-    const wb = XLSX.read(buffer,{type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    llenarFormulario(ws);
-  }catch(e){
-    console.warn("No cargó automático");
-  }
-}
-
-// recolectar datos
 function collect(){
-
   let workers=[];
   for(let i=0;i<11;i++){
     workers.push({
@@ -173,48 +132,65 @@ function collect(){
   };
 }
 
-// 🔥 GENERAR ATS (PRO)
-async function generarATS(event){
+// 🔥 PREVIEW
+function mostrarPreview(){
 
   const data = collect();
 
-  if(!data.lugar || !data.tipo_trabajo){
-    alert("Faltan datos obligatorios");
-    return;
-  }
+  let html = `
+  <h3>Resumen ATS</h3>
 
-  const btn = event.target;
-  btn.innerText = "Generando...";
-  btn.disabled = true;
+  <b>Fecha:</b> ${data.fecha_inicio} - ${data.fecha_fin}<br>
+  <b>Lugar:</b> ${data.lugar}<br>
+  <b>Trabajo:</b> ${data.tipo_trabajo}<br><br>
 
-  try{
+  <b>Pasos:</b><br>${data.pasos}<br><br>
+  <b>Máquinas:</b><br>${data.maquinas}<br><br>
+  <b>Peligros:</b><br>${data.peligros}<br><br>
+  <b>Controles:</b><br>${data.controles_ats}<br><br>
 
-    const response = await fetch(URL_BACKEND, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: JSON.stringify(data)
-    });
+  <b>Herramientas:</b><br>
+  ${data.h_manuales}<br>
+  ${data.h_electricas}<br>
+  ${data.obs_herramientas}<br><br>
 
-    const result = await response.json();
+  <b>Trabajadores:</b><br>
+  ${data.workers.map(w=>`${w.nombre} - ${w.cedula}`).join("<br>")}
+  <br><br>
 
-    alert("LISTO MIGUELITO 🚀");
+  <button onclick="volver()">✏️ Editar</button>
+  <button onclick="enviarFinal()">🚀 Confirmar y enviar</button>
+  `;
 
-    window.open(result.url, "_blank");
+  document.getElementById('preview').innerHTML = html;
+  document.getElementById('formulario').classList.add('hidden');
+  document.getElementById('preview').classList.remove('hidden');
+}
 
-  }catch(error){
-    alert("Error generando ATS");
-    console.error(error);
-  }
+function volver(){
+  document.getElementById('formulario').classList.remove('hidden');
+  document.getElementById('preview').classList.add('hidden');
+}
 
-  btn.innerText = "Generar ATS";
-  btn.disabled = false;
+// 🔥 ENVÍO FINAL
+async function enviarFinal(){
+
+  const data = collect();
+
+  const response = await fetch(URL_BACKEND, {
+    method: "POST",
+    headers: {"Content-Type":"text/plain"},
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+
+  alert("LISTO MIGUELITO 🚀");
+  window.open(result.url, "_blank");
 }
 
 // INIT
 crearWorkers();
-cargarBaseAuto();
 
 </script>
 
