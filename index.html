@@ -7,43 +7,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-body{
-  font-family: Arial;
-  background:#0f172a;
-  padding:20px;
-}
-#excel{
-  background:#fff;
-  border-radius:10px;
-  padding:10px;
-  overflow:auto;
-}
-td{
-  border:1px solid #000;
-  min-width:80px;
-  height:25px;
-  font-size:11px;
-  padding:2px;
-  cursor:pointer;
-}
-input{
-  width:100%;
-  border:none;
-  outline:none;
-}
-button{
-  margin-top:15px;
-  padding:12px;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
-}
+body{font-family:Arial;background:#0f172a;padding:20px}
+#excel{background:#fff;padding:10px;border-radius:10px;overflow:auto}
+td{border:1px solid #000;min-width:80px;height:25px;font-size:11px;padding:2px;cursor:pointer}
+input{width:100%;border:none;outline:none}
+button{margin-top:15px;padding:12px;background:#22c55e;border:none;border-radius:8px}
 </style>
 </head>
 
 <body>
 
-<h2 style="color:white">ATS REAL (EDITABLE)</h2>
+<h2 style="color:white">ATS REAL PRELLENADO</h2>
 
 <div id="excel"></div>
 
@@ -54,24 +28,31 @@ button{
 const URL_BACKEND = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
 let changes = {};
-let worksheet;
+let plantilla;
+let datos;
 
-// 🔥 CARGAR ATS REAL
+// 🔥 CARGAR AMBOS ARCHIVOS
 async function cargar(){
 
-  const res = await fetch('./ATS.xlsx');
-  const buffer = await res.arrayBuffer();
+  const resPlantilla = await fetch('./ATS.xlsx');
+  const resDatos = await fetch('./ATS_Abril_2026.xlsx');
 
-  const wb = XLSX.read(buffer,{type:'array'});
-  worksheet = wb.Sheets[wb.SheetNames[0]];
+  const buf1 = await resPlantilla.arrayBuffer();
+  const buf2 = await resDatos.arrayBuffer();
+
+  const wb1 = XLSX.read(buf1,{type:'array'});
+  const wb2 = XLSX.read(buf2,{type:'array'});
+
+  plantilla = wb1.Sheets[wb1.SheetNames[0]];
+  datos = wb2.Sheets[wb2.SheetNames[0]];
 
   render();
 }
 
-// 🔥 RENDER EXCEL
+// 🔥 RENDER CON DATOS REALES
 function render(){
 
-  const range = XLSX.utils.decode_range(worksheet['!ref']);
+  const range = XLSX.utils.decode_range(plantilla['!ref']);
   let html = "<table>";
 
   for(let R=range.s.r; R<=range.e.r; R++){
@@ -80,9 +61,11 @@ function render(){
     for(let C=range.s.c; C<=range.e.c; C++){
 
       const ref = XLSX.utils.encode_cell({r:R,c:C});
-      const val = worksheet[ref] ? worksheet[ref].v : "";
 
-      html += `<td data-cell="${ref}">${val || ""}</td>`;
+      // 🔥 USAR DATOS DE ABRIL
+      let value = datos[ref] ? datos[ref].v : "";
+
+      html += `<td data-cell="${ref}">${value || ""}</td>`;
     }
 
     html += "</tr>";
@@ -95,7 +78,7 @@ function render(){
   activarEdicion();
 }
 
-// 🔥 EDITAR COMO EXCEL
+// 🔥 EDICIÓN
 function activarEdicion(){
 
   document.querySelectorAll("td").forEach(td=>{
@@ -112,6 +95,7 @@ function activarEdicion(){
       input.focus();
 
       input.onblur = () => {
+
         td.innerText = input.value;
 
         const cell = td.dataset.cell;
@@ -123,7 +107,7 @@ function activarEdicion(){
 
 }
 
-// 🔥 ENVIAR A APPS SCRIPT
+// 🔥 ENVIAR CAMBIOS
 async function enviar(){
 
   const res = await fetch(URL_BACKEND,{
