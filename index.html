@@ -8,7 +8,8 @@
 body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
 .section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
 input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
-button{padding:12px;background:#22c55e;border:none;border-radius:8px}
+button{padding:12px;background:#22c55e;border:none;border-radius:8px;margin-top:10px}
+canvas{background:#fff;border-radius:8px}
 </style>
 </head>
 
@@ -35,20 +36,10 @@ button{padding:12px;background:#22c55e;border:none;border-radius:8px}
 </div>
 
 <div class="section">
-<h3>Herramientas</h3>
-<input id="manuales">
-<input id="electricas">
-<input id="otros">
-</div>
-
-<div class="section">
-<h3>Observaciones</h3>
-<textarea id="observaciones"></textarea>
-</div>
-
-<div class="section">
-<h3>Trabajadores</h3>
-<div id="workers"></div>
+<h3>Firma Digital</h3>
+<canvas id="firma" width="300" height="150"></canvas>
+<br>
+<button onclick="limpiarFirma()">Limpiar firma</button>
 </div>
 
 <button onclick="generarATS()">Generar ATS</button>
@@ -57,61 +48,51 @@ button{padding:12px;background:#22c55e;border:none;border-radius:8px}
 
 const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-// 🔥 CREAR TRABAJADORES
-function crearWorkers(lista=[]){
-  let html="";
-  for(let i=0;i<10;i++){
-    let w = lista[i] || {};
-    html += `
-      <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
-      <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
-    `;
-  }
-  document.getElementById("workers").innerHTML = html;
+// 🔥 FIRMA
+const canvas = document.getElementById("firma");
+const ctx = canvas.getContext("2d");
+
+let dibujando = false;
+
+canvas.addEventListener("mousedown",()=>dibujando=true);
+canvas.addEventListener("mouseup",()=>dibujando=false);
+canvas.addEventListener("mousemove",dibujar);
+
+function dibujar(e){
+  if(!dibujando) return;
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "black";
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
 }
 
-// 🔥 JSONP (SIN CORS)
+function limpiarFirma(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+// 🔥 JSONP BASE
 function cargarBase(){
-  const script = document.createElement("script");
-  script.src = URL + "?getBase=1&callback=llenarFormulario";
-  document.body.appendChild(script);
+  const s = document.createElement("script");
+  s.src = URL + "?getBase=1&callback=llenar";
+  document.body.appendChild(s);
 }
 
-// 🔥 FUNCIÓN CALLBACK
-function llenarFormulario(data){
+function llenar(data){
+  estado.innerText="Datos cargados ✔";
 
-  document.getElementById("estado").innerText = "Datos cargados ✔";
-
-  fecha_inicio.value = data.fecha_inicio || "";
-  fecha_fin.value = data.fecha_fin || "";
-  lugar.value = data.lugar || "";
-  tipo_trabajo.value = data.tipo_trabajo || "";
-
-  pasos.value = data.pasos || "";
-  maquinas.value = data.maquinas || "";
-  peligros.value = data.peligros || "";
-  controles.value = data.controles || "";
-
-  manuales.value = data.manuales || "";
-  electricas.value = data.electricas || "";
-  otros.value = data.otros || "";
-
-  observaciones.value = data.observaciones || "";
-
-  crearWorkers(data.workers || []);
+  fecha_inicio.value=data.fecha_inicio||"";
+  fecha_fin.value=data.fecha_fin||"";
+  lugar.value=data.lugar||"";
+  tipo_trabajo.value=data.tipo_trabajo||"";
 }
 
 // 🔥 ENVIAR
 function generarATS(){
 
-  const workers = [];
-
-  for(let i=0;i<10;i++){
-    workers.push({
-      nombre:document.getElementById("n_"+i).value,
-      cedula:document.getElementById("c_"+i).value
-    });
-  }
+  const firmaBase64 = canvas.toDataURL("image/png");
 
   const data = {
     fecha_inicio:fecha_inicio.value,
@@ -122,20 +103,15 @@ function generarATS(){
     maquinas:maquinas.value,
     peligros:peligros.value,
     controles:controles.value,
-    manuales:manuales.value,
-    electricas:electricas.value,
-    otros:otros.value,
-    observaciones:observaciones.value,
-    workers
+    firma:firmaBase64
   };
 
-  const script = document.createElement("script");
-  script.src = URL + "?postData=" + encodeURIComponent(JSON.stringify(data)) + "&callback=respuestaFinal";
-  document.body.appendChild(script);
+  const s = document.createElement("script");
+  s.src = URL + "?postData=" + encodeURIComponent(JSON.stringify(data)) + "&callback=fin";
+  document.body.appendChild(s);
 }
 
-// 🔥 RESPUESTA FINAL
-function respuestaFinal(r){
+function fin(r){
   alert("LISTO MIGUELITO 🚀");
   window.open(r.url);
 }
