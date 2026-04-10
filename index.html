@@ -2,219 +2,207 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS ORNATO - Producción</title>
+<title>ATS INTERACTIVO REAL</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
-.section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
-input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none;border-radius:6px}
-button{padding:12px;background:#22c55e;border:none;border-radius:8px;margin-top:10px;cursor:pointer}
-button:disabled{background:#555}
-canvas{background:#fff;border-radius:6px;margin-top:5px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#estado{margin-bottom:10px;font-size:14px;color:#94a3b8}
-.bad{color:#ef4444}
-.ok{color:#22c55e}
+body{background:#0f172a;font-family:Arial;padding:20px}
+table{border-collapse:collapse;margin:auto;background:#fff;width:95%}
+td{
+  border:1px solid #000;
+  font-size:11px;
+  padding:4px;
+  vertical-align:top;
+}
+[contenteditable]{background:#f1f5f9}
+.title{font-weight:bold;text-align:center;font-size:16px}
+.center{text-align:center}
 </style>
 </head>
 
 <body>
 
-<h2>ATS PRO</h2>
-<div id="estado">Inicializando...</div>
+<table>
 
-<div class="section">
-<h3>Información General</h3>
-<div class="row">
-  <input id="fecha_inicio" placeholder="Fecha inicio (AAAA-MM-DD)">
-  <input id="fecha_fin" placeholder="Fecha fin (AAAA-MM-DD)">
-</div>
-<input id="lugar" placeholder="Lugar">
-<textarea id="tipo_trabajo" placeholder="Tipo de trabajo"></textarea>
-</div>
+<!-- ENCABEZADO -->
+<tr>
+<td rowspan="3" colspan="3">
+<img src="https://i.imgur.com/8Km9tLL.png" width="100">
+</td>
 
-<div class="section">
-<h3>ATS</h3>
-<textarea id="pasos" placeholder="Pasos"></textarea>
-<textarea id="maquinas" placeholder="Máquinas"></textarea>
-<textarea id="peligros" placeholder="Peligros"></textarea>
-<textarea id="controles" placeholder="Controles"></textarea>
-</div>
+<td colspan="12" class="title">ANALISIS DE TRABAJO SEGURO</td>
 
-<div class="section">
-<h3>Trabajadores + Firma</h3>
-<div id="workers"></div>
-</div>
+<td colspan="5">
+Código: FOR-SST-04<br>
+Versión: 1<br>
+Vigencia: 14/02/2026
+</td>
+</tr>
+<tr></tr>
+<tr></tr>
 
-<button id="btnGenerar" onclick="generarATS()">Generar ATS</button>
+<!-- FECHAS -->
+<tr>
+<td colspan="5">FECHA INICIO ACTIVIDAD:</td>
+<td colspan="5" contenteditable id="J4"></td>
+
+<td colspan="5">FECHA FIN ACTIVIDAD</td>
+<td colspan="5" contenteditable id="O4"></td>
+</tr>
+
+<tr>
+<td colspan="5">LUGAR</td>
+<td colspan="15" contenteditable id="T4"></td>
+</tr>
+
+<tr>
+<td colspan="5">TIPO DE TRABAJO</td>
+<td colspan="15" contenteditable id="A5"></td>
+</tr>
+
+<!-- TITULO ATS -->
+<tr>
+<td colspan="20" class="center"><b>ANÁLISIS DE TRABAJO SEGURO - ATS</b></td>
+</tr>
+
+<!-- CABECERA TABLA -->
+<tr>
+<td colspan="5" class="center"><b>SECUENCIA DE PASOS</b></td>
+<td colspan="5" class="center"><b>MAQUINAS</b></td>
+<td colspan="5" class="center"><b>PELIGROS</b></td>
+<td colspan="5" class="center"><b>CONTROLES</b></td>
+</tr>
+
+<!-- CONTENIDO -->
+<tr style="height:200px">
+<td colspan="5" contenteditable id="A8"></td>
+<td colspan="5" contenteditable id="F8"></td>
+<td colspan="5" contenteditable id="H8"></td>
+<td colspan="5" contenteditable id="O8"></td>
+</tr>
+
+<!-- HERRAMIENTAS -->
+<tr>
+<td colspan="20"><b>HERRAMIENTAS</b></td>
+</tr>
+
+<tr>
+<td colspan="5">Manuales</td>
+<td colspan="15" contenteditable id="F21"></td>
+</tr>
+
+<tr>
+<td colspan="5">Eléctricas</td>
+<td colspan="15" contenteditable id="F22"></td>
+</tr>
+
+<tr>
+<td colspan="5">Otros</td>
+<td colspan="15" contenteditable id="F25"></td>
+</tr>
+
+<!-- OBSERVACIONES -->
+<tr>
+<td colspan="20"><b>OBSERVACIONES</b></td>
+</tr>
+
+<tr style="height:80px">
+<td colspan="20" contenteditable id="A97"></td>
+</tr>
+
+<!-- TRABAJADORES -->
+<tr>
+<td colspan="2"><b>#</b></td>
+<td colspan="8"><b>NOMBRE</b></td>
+<td colspan="5"><b>CÉDULA</b></td>
+<td colspan="5"><b>FIRMA</b></td>
+</tr>
+
+<tbody id="trabajadores"></tbody>
+
+</table>
 
 <script>
 
-const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
-const REQUIRE_SIGNATURE = false; // 🔒 cambia a true si quieres obligar firma
+const URL = "TU_URL_AQUI";
 
-function setEstado(msg, ok=true){
-  const el = document.getElementById("estado");
-  el.className = ok ? "ok" : "bad";
-  el.innerText = msg;
-}
+// 🔥 CREAR FILAS TRABAJADORES
+function crearTrabajadores(lista=[]){
 
-function crearWorkers(lista=[]){
   let html="";
+
   for(let i=0;i<10;i++){
-    let w = lista[i] || {};
-    html += `
-      <div style="margin-bottom:12px;border-bottom:1px solid #475569;padding-bottom:10px;">
-        <div class="row">
-          <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
-          <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
-        </div>
-        <canvas id="firma_${i}" width="260" height="110"></canvas>
-        <div>
-          <button onclick="limpiarFirma(${i})">Limpiar firma</button>
-        </div>
-      </div>
-    `;
+
+    let w=lista[i]||{};
+
+    html+=`
+    <tr>
+      <td colspan="2">${i+1}</td>
+      <td colspan="8" contenteditable id="n_${i}">${w.nombre||""}</td>
+      <td colspan="5" contenteditable id="c_${i}">${w.cedula||""}</td>
+      <td colspan="5">
+        <canvas id="firma_${i}" width="120" height="40"></canvas>
+      </td>
+    </tr>`;
   }
-  document.getElementById("workers").innerHTML = html;
-  setTimeout(initFirmas, 100);
+
+  document.getElementById("trabajadores").innerHTML=html;
+
+  setTimeout(initFirmas,100);
 }
 
+// 🔥 FIRMAS
 function initFirmas(){
+
   for(let i=0;i<10;i++){
-    const c = document.getElementById("firma_"+i);
-    const ctx = c.getContext("2d");
-    let down=false;
 
-    const start = (x,y)=>{ down=true; ctx.beginPath(); ctx.moveTo(x,y); };
-    const move  = (x,y)=>{ if(!down) return; ctx.lineWidth=2; ctx.lineCap="round"; ctx.lineTo(x,y); ctx.stroke(); };
-    const end   = ()=>{ down=false; ctx.beginPath(); };
+    const c=document.getElementById("firma_"+i);
+    const ctx=c.getContext("2d");
 
-    // mouse
-    c.addEventListener("mousedown", e=>start(e.offsetX,e.offsetY));
-    c.addEventListener("mousemove", e=>move(e.offsetX,e.offsetY));
-    window.addEventListener("mouseup", end);
+    let d=false;
 
-    // touch
-    c.addEventListener("touchstart", e=>{
-      const r=c.getBoundingClientRect();
-      const t=e.touches[0];
-      start(t.clientX-r.left, t.clientY-r.top);
-      e.preventDefault();
-    }, {passive:false});
+    c.onmousedown=()=>d=true;
+    c.onmouseup=()=>d=false;
 
-    c.addEventListener("touchmove", e=>{
-      const r=c.getBoundingClientRect();
-      const t=e.touches[0];
-      move(t.clientX-r.left, t.clientY-r.top);
-      e.preventDefault();
-    }, {passive:false});
-
-    window.addEventListener("touchend", end);
+    c.onmousemove=e=>{
+      if(!d)return;
+      ctx.lineTo(e.offsetX,e.offsetY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX,e.offsetY);
+    };
   }
 }
 
-function limpiarFirma(i){
-  const c=document.getElementById("firma_"+i);
-  c.getContext("2d").clearRect(0,0,c.width,c.height);
-}
+// 🔥 CARGAR BASE
+function cargar(){
 
-// JSONP
-function cargarBase(){
-  setEstado("Cargando base...");
   const s=document.createElement("script");
-  s.src = URL + "?getBase=1&callback=llenar";
+  s.src=URL+"?getBase=1&callback=llenar";
   document.body.appendChild(s);
 }
 
 function llenar(data){
-  setEstado("Datos base cargados ✔");
 
-  fecha_inicio.value=data.fecha_inicio||"";
-  fecha_fin.value=data.fecha_fin||"";
-  lugar.value=data.lugar||"";
-  tipo_trabajo.value=data.tipo_trabajo||"";
+  J4.innerText=data.fecha_inicio;
+  O4.innerText=data.fecha_fin;
+  T4.innerText=data.lugar;
+  A5.innerText=data.tipo_trabajo;
 
-  pasos.value=data.pasos||"";
-  maquinas.value=data.maquinas||"";
-  peligros.value=data.peligros||"";
-  controles.value=data.controles||"";
+  A8.innerText=data.pasos;
+  F8.innerText=data.maquinas;
+  H8.innerText=data.peligros;
+  O8.innerText=data.controles;
 
-  crearWorkers(data.workers||[]);
+  F21.innerText=data.manuales;
+  F22.innerText=data.electricas;
+  F25.innerText=data.otros;
+
+  A97.innerText=data.observaciones;
+
+  crearTrabajadores(data.workers||[]);
 }
 
-// Validación
-function validar(data){
-  if(!data.fecha_inicio || !data.fecha_fin){
-    return "Debes ingresar fechas de inicio y fin";
-  }
-  const activos = data.workers.filter(w=>w.nombre || w.cedula);
-  if(activos.length===0){
-    return "Debes ingresar al menos un trabajador";
-  }
-  if(REQUIRE_SIGNATURE){
-    const sinFirma = activos.find(w=>!w.firma || w.firma.length < 1000);
-    if(sinFirma){
-      return "Hay trabajadores sin firma";
-    }
-  }
-  return null;
-}
-
-function generarATS(){
-
-  const btn = document.getElementById("btnGenerar");
-  btn.disabled = true;
-  setEstado("Generando ATS...");
-
-  const workers=[];
-  for(let i=0;i<10;i++){
-    const canvas=document.getElementById("firma_"+i);
-    workers.push({
-      nombre:document.getElementById("n_"+i).value,
-      cedula:document.getElementById("c_"+i).value,
-      firma:canvas.toDataURL("image/png")
-    });
-  }
-
-  const data={
-    fecha_inicio:fecha_inicio.value,
-    fecha_fin:fecha_fin.value,
-    lugar:lugar.value,
-    tipo_trabajo:tipo_trabajo.value,
-    pasos:pasos.value,
-    maquinas:maquinas.value,
-    peligros:peligros.value,
-    controles:controles.value,
-    workers
-  };
-
-  const err = validar(data);
-  if(err){
-    setEstado(err,false);
-    btn.disabled = false;
-    return;
-  }
-
-  const s=document.createElement("script");
-  s.src = URL + "?postData=" + encodeURIComponent(JSON.stringify(data)) + "&callback=fin";
-  document.body.appendChild(s);
-}
-
-function fin(r){
-  setEstado("ATS generado ✔");
-  alert("LISTO MIGUELITO 🚀");
-
-  // descarga directa
-  const a=document.createElement("a");
-  a.href=r.url;
-  a.target="_blank";
-  a.click();
-
-  document.getElementById("btnGenerar").disabled=false;
-}
-
-cargarBase();
+cargar();
 
 </script>
 
