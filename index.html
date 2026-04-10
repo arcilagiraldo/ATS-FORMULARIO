@@ -2,131 +2,54 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS INTERACTIVO REAL</title>
+<title>ATS</title>
 
 <style>
-body{background:#0f172a;font-family:Arial;padding:20px}
-table{border-collapse:collapse;margin:auto;background:#fff;width:95%}
-td{
-  border:1px solid #000;
-  font-size:11px;
-  padding:4px;
-  vertical-align:top;
-}
-[contenteditable]{background:#f1f5f9}
-.title{font-weight:bold;text-align:center;font-size:16px}
-.center{text-align:center}
+body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
+.section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
+input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
+button{padding:12px;background:#22c55e;border:none;border-radius:8px}
 </style>
 </head>
 
 <body>
 
-<table>
+<h2>ATS</h2>
+<div id="estado">Cargando...</div>
 
-<!-- ENCABEZADO -->
-<tr>
-<td rowspan="3" colspan="3">
-<img src="https://i.imgur.com/8Km9tLL.png" width="100">
-</td>
+<div class="section">
+<h3>Información</h3>
+<input id="fecha_inicio">
+<input id="fecha_fin">
+<input id="lugar">
+<textarea id="tipo_trabajo"></textarea>
+</div>
 
-<td colspan="12" class="title">ANALISIS DE TRABAJO SEGURO</td>
+<div class="section">
+<h3>ATS</h3>
+<textarea id="pasos"></textarea>
+<textarea id="maquinas"></textarea>
+<textarea id="peligros"></textarea>
+<textarea id="controles"></textarea>
+</div>
 
-<td colspan="5">
-Código: FOR-SST-04<br>
-Versión: 1<br>
-Vigencia: 14/02/2026
-</td>
-</tr>
-<tr></tr>
-<tr></tr>
+<div class="section">
+<h3>Observaciones</h3>
+<textarea id="observaciones"></textarea>
+</div>
 
-<!-- FECHAS -->
-<tr>
-<td colspan="5">FECHA INICIO ACTIVIDAD:</td>
-<td colspan="5" contenteditable id="J4"></td>
+<div class="section">
+<h3>Trabajadores</h3>
+<div id="workers"></div>
+</div>
 
-<td colspan="5">FECHA FIN ACTIVIDAD</td>
-<td colspan="5" contenteditable id="O4"></td>
-</tr>
-
-<tr>
-<td colspan="5">LUGAR</td>
-<td colspan="15" contenteditable id="T4"></td>
-</tr>
-
-<tr>
-<td colspan="5">TIPO DE TRABAJO</td>
-<td colspan="15" contenteditable id="A5"></td>
-</tr>
-
-<!-- TITULO ATS -->
-<tr>
-<td colspan="20" class="center"><b>ANÁLISIS DE TRABAJO SEGURO - ATS</b></td>
-</tr>
-
-<!-- CABECERA TABLA -->
-<tr>
-<td colspan="5" class="center"><b>SECUENCIA DE PASOS</b></td>
-<td colspan="5" class="center"><b>MAQUINAS</b></td>
-<td colspan="5" class="center"><b>PELIGROS</b></td>
-<td colspan="5" class="center"><b>CONTROLES</b></td>
-</tr>
-
-<!-- CONTENIDO -->
-<tr style="height:200px">
-<td colspan="5" contenteditable id="A8"></td>
-<td colspan="5" contenteditable id="F8"></td>
-<td colspan="5" contenteditable id="H8"></td>
-<td colspan="5" contenteditable id="O8"></td>
-</tr>
-
-<!-- HERRAMIENTAS -->
-<tr>
-<td colspan="20"><b>HERRAMIENTAS</b></td>
-</tr>
-
-<tr>
-<td colspan="5">Manuales</td>
-<td colspan="15" contenteditable id="F21"></td>
-</tr>
-
-<tr>
-<td colspan="5">Eléctricas</td>
-<td colspan="15" contenteditable id="F22"></td>
-</tr>
-
-<tr>
-<td colspan="5">Otros</td>
-<td colspan="15" contenteditable id="F25"></td>
-</tr>
-
-<!-- OBSERVACIONES -->
-<tr>
-<td colspan="20"><b>OBSERVACIONES</b></td>
-</tr>
-
-<tr style="height:80px">
-<td colspan="20" contenteditable id="A97"></td>
-</tr>
-
-<!-- TRABAJADORES -->
-<tr>
-<td colspan="2"><b>#</b></td>
-<td colspan="8"><b>NOMBRE</b></td>
-<td colspan="5"><b>CÉDULA</b></td>
-<td colspan="5"><b>FIRMA</b></td>
-</tr>
-
-<tbody id="trabajadores"></tbody>
-
-</table>
+<button onclick="generar()">Generar ATS</button>
 
 <script>
 
-const URL = "TU_URL_AQUI";
+const URL="TU_URL_WEBAPP";
 
-// 🔥 CREAR FILAS TRABAJADORES
-function crearTrabajadores(lista=[]){
+function crearWorkers(lista=[]){
 
   let html="";
 
@@ -135,45 +58,15 @@ function crearTrabajadores(lista=[]){
     let w=lista[i]||{};
 
     html+=`
-    <tr>
-      <td colspan="2">${i+1}</td>
-      <td colspan="8" contenteditable id="n_${i}">${w.nombre||""}</td>
-      <td colspan="5" contenteditable id="c_${i}">${w.cedula||""}</td>
-      <td colspan="5">
-        <canvas id="firma_${i}" width="120" height="40"></canvas>
-      </td>
-    </tr>`;
+      <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
+      <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
+    `;
   }
 
-  document.getElementById("trabajadores").innerHTML=html;
-
-  setTimeout(initFirmas,100);
+  workers.innerHTML=html;
 }
 
-// 🔥 FIRMAS
-function initFirmas(){
-
-  for(let i=0;i<10;i++){
-
-    const c=document.getElementById("firma_"+i);
-    const ctx=c.getContext("2d");
-
-    let d=false;
-
-    c.onmousedown=()=>d=true;
-    c.onmouseup=()=>d=false;
-
-    c.onmousemove=e=>{
-      if(!d)return;
-      ctx.lineTo(e.offsetX,e.offsetY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.offsetX,e.offsetY);
-    };
-  }
-}
-
-// 🔥 CARGAR BASE
+// 🔥 CARGAR BASE (JSONP)
 function cargar(){
 
   const s=document.createElement("script");
@@ -183,23 +76,56 @@ function cargar(){
 
 function llenar(data){
 
-  J4.innerText=data.fecha_inicio;
-  O4.innerText=data.fecha_fin;
-  T4.innerText=data.lugar;
-  A5.innerText=data.tipo_trabajo;
+  estado.innerText="Datos cargados ✔";
 
-  A8.innerText=data.pasos;
-  F8.innerText=data.maquinas;
-  H8.innerText=data.peligros;
-  O8.innerText=data.controles;
+  fecha_inicio.value=data.fecha_inicio||"";
+  fecha_fin.value=data.fecha_fin||"";
+  lugar.value=data.lugar||"";
+  tipo_trabajo.value=data.tipo_trabajo||"";
 
-  F21.innerText=data.manuales;
-  F22.innerText=data.electricas;
-  F25.innerText=data.otros;
+  pasos.value=data.pasos||"";
+  maquinas.value=data.maquinas||"";
+  peligros.value=data.peligros||"";
+  controles.value=data.controles||"";
 
-  A97.innerText=data.observaciones;
+  observaciones.value=data.observaciones||"";
 
-  crearTrabajadores(data.workers||[]);
+  crearWorkers(data.workers||[]);
+}
+
+// 🔥 GENERAR
+function generar(){
+
+  const workersData=[];
+
+  for(let i=0;i<10;i++){
+    workersData.push({
+      nombre:document.getElementById("n_"+i).value,
+      cedula:document.getElementById("c_"+i).value
+    });
+  }
+
+  const data={
+    fecha_inicio:fecha_inicio.value,
+    fecha_fin:fecha_fin.value,
+    lugar:lugar.value,
+    tipo_trabajo:tipo_trabajo.value,
+    pasos:pasos.value,
+    maquinas:maquinas.value,
+    peligros:peligros.value,
+    controles:controles.value,
+    observaciones:observaciones.value,
+    workers:workersData
+  };
+
+  const s=document.createElement("script");
+  s.src=URL+"?postData="+encodeURIComponent(JSON.stringify(data))+"&callback=fin";
+  document.body.appendChild(s);
+}
+
+function fin(r){
+  alert("LISTO MIGUELITO 🚀");
+  window.open(r.url);
 }
 
 cargar();
