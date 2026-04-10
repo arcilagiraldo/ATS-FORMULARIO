@@ -2,49 +2,81 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS</title>
+<title>ATS INTERACTIVO REAL</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
-.section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
-input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
-button{padding:12px;background:#22c55e;border:none;border-radius:8px}
-canvas{background:#fff;border-radius:6px;margin-top:5px}
+body{background:#0f172a;margin:0;padding:20px;font-family:Arial}
+table{border-collapse:collapse;background:#fff;color:#000;width:100%}
+td{border:1px solid #000;padding:4px;font-size:12px;vertical-align:top}
+input,textarea{width:100%;border:none;font-size:12px}
+textarea{resize:none;height:100%}
+canvas{border:1px solid #000;background:#fff}
+button{margin-top:15px;padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#000;font-weight:bold}
 </style>
-</head>
 
+</head>
 <body>
 
-<h2>ATS</h2>
-<div id="estado">Cargando...</div>
+<h2 style="color:white">ATS INTERACTIVO (FORMATO REAL)</h2>
 
-<div class="section">
-<h3>Información</h3>
-<input id="fecha_inicio">
-<input id="fecha_fin">
-<input id="lugar">
-<textarea id="tipo_trabajo"></textarea>
-</div>
+<table>
 
-<div class="section">
-<h3>ATS</h3>
-<textarea id="pasos"></textarea>
-<textarea id="maquinas"></textarea>
-<textarea id="peligros"></textarea>
-<textarea id="controles"></textarea>
-</div>
+<tr>
+<td colspan="20" style="text-align:center;font-weight:bold;font-size:16px">
+ANÁLISIS DE TRABAJO SEGURO
+</td>
+</tr>
 
-<div class="section">
-<h3>Observaciones</h3>
+<tr>
+<td colspan="5">FECHA INICIO</td>
+<td colspan="5"><input id="fecha_inicio"></td>
+<td colspan="5">FECHA FIN</td>
+<td colspan="5"><input id="fecha_fin"></td>
+</tr>
+
+<tr>
+<td colspan="5">LUGAR</td>
+<td colspan="15"><input id="lugar"></td>
+</tr>
+
+<tr>
+<td colspan="5">TIPO DE TRABAJO</td>
+<td colspan="15"><textarea id="tipo_trabajo"></textarea></td>
+</tr>
+
+<tr>
+<td colspan="5">SECUENCIA DE PASOS</td>
+<td colspan="5">MAQUINAS</td>
+<td colspan="5">PELIGROS</td>
+<td colspan="5">CONTROLES</td>
+</tr>
+
+<tr style="height:120px">
+<td colspan="5"><textarea id="pasos"></textarea></td>
+<td colspan="5"><textarea id="maquinas"></textarea></td>
+<td colspan="5"><textarea id="peligros"></textarea></td>
+<td colspan="5"><textarea id="controles"></textarea></td>
+</tr>
+
+<tr>
+<td colspan="20" style="font-weight:bold">TRABAJADORES</td>
+</tr>
+
+<tbody id="workers"></tbody>
+
+<tr>
+<td colspan="20">OBSERVACIONES</td>
+</tr>
+
+<tr>
+<td colspan="20" style="height:80px">
 <textarea id="observaciones"></textarea>
-</div>
+</td>
+</tr>
 
-<div class="section">
-<h3>Trabajadores + Firma</h3>
-<div id="workers"></div>
-</div>
+</table>
 
-<button onclick="generar()">Generar ATS</button>
+<button onclick="generar()">GENERAR ATS</button>
 
 <script>
 
@@ -52,119 +84,116 @@ const URL="https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KD
 
 function crearWorkers(lista=[]){
 
-  let html="";
+let html="";
 
-  for(let i=0;i<10;i++){
+for(let i=0;i<10;i++){
 
-    let w=lista[i]||{};
+let w=lista[i]||{};
 
-    html+=`
-      <div style="margin-bottom:10px;padding:10px;border-bottom:1px solid #555;">
-        <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
-        <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
+html+=`
+<tr>
+<td colspan="2">${i+1}</td>
+<td colspan="6"><input id="n_${i}" value="${w.nombre||''}"></td>
+<td colspan="6"><input id="c_${i}" value="${w.cedula||''}"></td>
+<td colspan="6">
+<canvas id="firma_${i}" width="200" height="80"></canvas>
+<button onclick="limpiarFirma(${i})">X</button>
+</td>
+</tr>
+`;
+}
 
-        <canvas id="firma_${i}" width="250" height="100"></canvas>
-        <br>
-        <button onclick="limpiarFirma(${i})">Limpiar firma</button>
-      </div>
-    `;
-  }
-
-  workers.innerHTML=html;
-
-  setTimeout(initFirmas,100);
+workers.innerHTML=html;
+setTimeout(initFirmas,200);
 }
 
 function initFirmas(){
 
-  for(let i=0;i<10;i++){
+for(let i=0;i<10;i++){
 
-    const c=document.getElementById("firma_"+i);
-    const ctx=c.getContext("2d");
+let c=document.getElementById("firma_"+i);
+let ctx=c.getContext("2d");
 
-    let d=false;
+let d=false;
 
-    c.onmousedown=()=>d=true;
-    c.onmouseup=()=>d=false;
+c.onmousedown=()=>d=true;
+c.onmouseup=()=>d=false;
 
-    c.onmousemove=e=>{
-      if(!d)return;
-      ctx.lineWidth=2;
-      ctx.lineCap="round";
-      ctx.lineTo(e.offsetX,e.offsetY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.offsetX,e.offsetY);
-    };
-  }
+c.onmousemove=e=>{
+if(!d)return;
+ctx.lineWidth=2;
+ctx.lineTo(e.offsetX,e.offsetY);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(e.offsetX,e.offsetY);
+};
+}
 }
 
 function limpiarFirma(i){
-  const c=document.getElementById("firma_"+i);
-  c.getContext("2d").clearRect(0,0,c.width,c.height);
+let c=document.getElementById("firma_"+i);
+c.getContext("2d").clearRect(0,0,c.width,c.height);
 }
 
 function cargar(){
-  const s=document.createElement("script");
-  s.src=URL+"?getBase=1&callback=llenar";
-  document.body.appendChild(s);
+let s=document.createElement("script");
+s.src=URL+"?getBase=1&callback=llenar";
+document.body.appendChild(s);
 }
 
-function llenar(data){
+function llenar(d){
 
-  estado.innerText="Datos cargados ✔";
+fecha_inicio.value=d.fecha_inicio||"";
+fecha_fin.value=d.fecha_fin||"";
+lugar.value=d.lugar||"";
+tipo_trabajo.value=d.tipo_trabajo||"";
 
-  fecha_inicio.value=data.fecha_inicio||"";
-  fecha_fin.value=data.fecha_fin||"";
-  lugar.value=data.lugar||"";
-  tipo_trabajo.value=data.tipo_trabajo||"";
+pasos.value=d.pasos||"";
+maquinas.value=d.maquinas||"";
+peligros.value=d.peligros||"";
+controles.value=d.controles||"";
 
-  pasos.value=data.pasos||"";
-  maquinas.value=data.maquinas||"";
-  peligros.value=data.peligros||"";
-  controles.value=data.controles||"";
+observaciones.value=d.observaciones||"";
 
-  observaciones.value=data.observaciones||"";
-
-  crearWorkers(data.workers||[]);
+crearWorkers(d.workers||[]);
 }
 
 function generar(){
 
-  const workersData=[];
+let workersData=[];
 
-  for(let i=0;i<10;i++){
+for(let i=0;i<10;i++){
 
-    const canvas=document.getElementById("firma_"+i);
+let canvas=document.getElementById("firma_"+i);
 
-    workersData.push({
-      nombre:document.getElementById("n_"+i).value,
-      cedula:document.getElementById("c_"+i).value,
-      firma:canvas.toDataURL("image/png")
-    });
-  }
+workersData.push({
+nombre:document.getElementById("n_"+i).value,
+cedula:document.getElementById("c_"+i).value,
+firma:canvas.toDataURL()
+});
+}
 
-  const data={
-    fecha_inicio:fecha_inicio.value,
-    fecha_fin:fecha_fin.value,
-    lugar:lugar.value,
-    tipo_trabajo:tipo_trabajo.value,
-    pasos:pasos.value,
-    maquinas:maquinas.value,
-    peligros:peligros.value,
-    controles:controles.value,
-    observaciones:observaciones.value,
-    workers:workersData
-  };
+let data={
+fecha_inicio:fecha_inicio.value,
+fecha_fin:fecha_fin.value,
+lugar:lugar.value,
+tipo_trabajo:tipo_trabajo.value,
+pasos:pasos.value,
+maquinas:maquinas.value,
+peligros:peligros.value,
+controles:controles.value,
+observaciones:observaciones.value,
+workers:workersData
+};
 
-  const s=document.createElement("script");
-  s.src=URL+"?postData="+encodeURIComponent(JSON.stringify(data))+"&callback=fin";
-  document.body.appendChild(s);
+let s=document.createElement("script");
+s.src=URL+"?postData="+encodeURIComponent(JSON.stringify(data))+"&callback=fin";
+document.body.appendChild(s);
 }
 
 function fin(r){
-  alert("LISTO MIGUELITO 🚀");
-  window.open(r.url);
+alert("LISTO MIGUELITO 🚀");
+window.open(r.url);
 }
 
 cargar();
