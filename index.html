@@ -2,46 +2,92 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ATS</title>
+<title>ATS PRO FINAL</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+  padding:20px;
+}
+input,textarea{
+  width:100%;
+  margin:5px 0;
+  padding:8px;
+}
+button{
+  background:#22c55e;
+  color:white;
+  padding:10px;
+  border:none;
+  cursor:pointer;
+}
+iframe{
+  margin-top:20px;
+  border:2px solid #ccc;
+  width:100%;
+  height:800px;
+  background:white;
+}
+</style>
+
 </head>
 
 <body>
 
-<h2>ATS</h2>
+<h2>ATS PRO (REAL)</h2>
 
 <input id="fi" placeholder="Fecha inicio">
 <input id="ff" placeholder="Fecha fin">
 <input id="lugar" placeholder="Lugar">
 
-<br><br>
-
 <textarea id="tipo" placeholder="Tipo trabajo"></textarea>
 <textarea id="pasos" placeholder="Pasos"></textarea>
-<textarea id="maq" placeholder="Maquinas"></textarea>
+<textarea id="maq" placeholder="Máquinas"></textarea>
 <textarea id="pel" placeholder="Peligros"></textarea>
 <textarea id="con" placeholder="Controles"></textarea>
 <textarea id="obs" placeholder="Observaciones"></textarea>
 
-<br><br>
+<button onclick="generar()">GENERAR ATS</button>
 
-<button onclick="enviar()">GENERAR ATS</button>
+<!-- 🔥 ATS REAL -->
+<iframe id="visor"
+src="https://docs.google.com/spreadsheets/d/1nb-PX8mkBM7lXFstMomjjtje1lVb_i0Q/edit?rm=minimal">
+</iframe>
 
 <script>
 
 const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-function enviar(){
+// 🔹 PRECARGAR AUTOMÁTICO
+fetch(URL+"?getBase=1")
+.then(r=>r.json())
+.then(d=>{
+fi.value=d.fi||"";
+ff.value=d.ff||"";
+lugar.value=d.lugar||"";
+tipo.value=d.tipo||"";
+pasos.value=d.pasos||"";
+maq.value=d.maq||"";
+pel.value=d.pel||"";
+con.value=d.con||"";
+obs.value=d.obs||"";
+});
 
-const data = {
-fi: document.getElementById("fi").value,
-ff: document.getElementById("ff").value,
-lugar: document.getElementById("lugar").value,
-tipo: document.getElementById("tipo").value,
-pasos: document.getElementById("pasos").value,
-maq: document.getElementById("maq").value,
-pel: document.getElementById("pel").value,
-con: document.getElementById("con").value,
-obs: document.getElementById("obs").value
+// 🔹 GENERAR ATS
+function generar(){
+
+const data={
+fi:fi.value,
+ff:ff.value,
+lugar:lugar.value,
+tipo:tipo.value,
+pasos:pasos.value,
+maq:maq.value,
+pel:pel.value,
+con:con.value,
+obs:obs.value
 };
 
 fetch(URL,{
@@ -51,7 +97,13 @@ body:JSON.stringify(data)
 .then(r=>r.json())
 .then(r=>{
 alert("LISTO MIGUELITO 🚀");
+
+// 🔥 ABRE EN DRIVE
 window.open(r.url);
+
+// 🔥 DESCARGA AUTOMÁTICA
+window.open(r.download);
+
 });
 
 }
