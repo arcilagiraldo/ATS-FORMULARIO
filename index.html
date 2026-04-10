@@ -2,92 +2,35 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS REAL</title>
+<title>ATS FINAL</title>
 
 <style>
 body{background:#0f172a;margin:0;padding:20px;font-family:Arial}
-.container{background:#fff;padding:10px}
-table{border-collapse:collapse;width:100%}
-td{border:1px solid #000;font-size:11px;padding:3px;vertical-align:top}
-.center{text-align:center;font-weight:bold}
+.wrap{background:#fff;padding:10px;overflow:auto}
+.grid{
+display:grid;
+grid-template-columns:80px repeat(11,120px);
+border:1px solid #000;
+}
+.cell{
+border:1px solid #000;
+font-size:11px;
+padding:3px;
+min-height:25px;
+}
+.center{display:flex;align-items:center;justify-content:center;font-weight:bold}
 input,textarea{width:100%;border:none;font-size:11px}
 textarea{resize:none;height:100%}
-.logo{width:80px}
-canvas{background:#fff;border:1px solid #000}
+canvas{border:1px solid #000;background:#fff}
+button{margin-top:15px;padding:10px 20px;background:#22c55e;border:none;border-radius:8px}
+.logo{width:70px}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<table>
-
-<tr>
-<td rowspan="3" style="width:90px;text-align:center">
-<img src="https://cdn-icons-png.flaticon.com/512/1048/1048946.png" class="logo">
-</td>
-<td colspan="10" class="center" style="font-size:16px">ANÁLISIS DE TRABAJO SEGURO</td>
-<td colspan="5">Código: FOR-SST-04</td>
-</tr>
-
-<tr>
-<td colspan="10"></td>
-<td colspan="5">Versión: 1</td>
-</tr>
-
-<tr>
-<td colspan="10"></td>
-<td colspan="5">Vigencia: 14/02/2026</td>
-</tr>
-
-<tr>
-<td colspan="3">FECHA INICIO</td>
-<td colspan="4"><input id="fecha_inicio"></td>
-<td colspan="3">FECHA FIN</td>
-<td colspan="5"><input id="fecha_fin"></td>
-</tr>
-
-<tr>
-<td colspan="3">LUGAR</td>
-<td colspan="12"><input id="lugar"></td>
-</tr>
-
-<tr>
-<td colspan="3">TIPO DE TRABAJO</td>
-<td colspan="12"><textarea id="tipo_trabajo"></textarea></td>
-</tr>
-
-<tr class="center">
-<td colspan="4">SECUENCIA</td>
-<td colspan="4">MAQUINAS</td>
-<td colspan="4">PELIGROS</td>
-<td colspan="3">CONTROLES</td>
-</tr>
-
-<tr style="height:140px">
-<td colspan="4"><textarea id="pasos"></textarea></td>
-<td colspan="4"><textarea id="maquinas"></textarea></td>
-<td colspan="4"><textarea id="peligros"></textarea></td>
-<td colspan="3"><textarea id="controles"></textarea></td>
-</tr>
-
-<tr>
-<td colspan="15" class="center">TRABAJADORES</td>
-</tr>
-
-<tbody id="workers"></tbody>
-
-<tr>
-<td colspan="15">OBSERVACIONES</td>
-</tr>
-
-<tr style="height:80px">
-<td colspan="15"><textarea id="observaciones"></textarea></td>
-</tr>
-
-</table>
-
+<div class="wrap">
+<div class="grid" id="g"></div>
 </div>
 
 <button onclick="generar()">GENERAR ATS</button>
@@ -95,109 +38,126 @@ canvas{background:#fff;border:1px solid #000}
 <script>
 
 const URL="https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+const g=document.getElementById("g");
 
-function crearWorkers(lista=[]){
+function c(span,html=""){return `<div class="cell" style="grid-column:span ${span}">${html}</div>`;}
 
-let html="";
+function render(d={}){
+
+g.innerHTML="";
+
+/* HEADER */
+g.innerHTML+=c(1,`<img class="logo" src="https://cdn-icons-png.flaticon.com/512/1048/1048946.png">`);
+g.innerHTML+=c(8,"<b>ANÁLISIS DE TRABAJO SEGURO</b>");
+g.innerHTML+=c(3,"Código: FOR-SST-04");
+
+g.innerHTML+=c(9,"");
+g.innerHTML+=c(3,"Versión: 1");
+
+g.innerHTML+=c(9,"");
+g.innerHTML+=c(3,"Vigencia: 14/02/2026");
+
+/* FECHAS */
+g.innerHTML+=c(2,"FECHA INICIO");
+g.innerHTML+=c(4,`<input id="fi" value="${d.fecha_inicio||""}">`);
+g.innerHTML+=c(2,"FECHA FIN");
+g.innerHTML+=c(4,`<input id="ff" value="${d.fecha_fin||""}">`);
+
+/* LUGAR */
+g.innerHTML+=c(2,"LUGAR");
+g.innerHTML+=c(10,`<input id="lugar" value="${d.lugar||""}">`);
+
+/* TIPO */
+g.innerHTML+=c(2,"TIPO TRABAJO");
+g.innerHTML+=c(10,`<textarea id="tipo">${d.tipo_trabajo||""}</textarea>`);
+
+/* TITULOS */
+g.innerHTML+=c(3,"SECUENCIA");
+g.innerHTML+=c(3,"MAQUINAS");
+g.innerHTML+=c(3,"PELIGROS");
+g.innerHTML+=c(3,"CONTROLES");
+
+/* BLOQUES */
+g.innerHTML+=c(3,`<textarea id="pasos">${d.pasos||""}</textarea>`);
+g.innerHTML+=c(3,`<textarea id="maq">${d.maquinas||""}</textarea>`);
+g.innerHTML+=c(3,`<textarea id="pel">${d.peligros||""}</textarea>`);
+g.innerHTML+=c(3,`<textarea id="con">${d.controles||""}</textarea>`);
+
+/* TRABAJADORES */
+g.innerHTML+=c(12,"<b>TRABAJADORES</b>");
 
 for(let i=0;i<10;i++){
 
-let w=lista[i]||{};
+let w=d.workers?.[i]||{};
 
-html+=`
-<tr>
-<td>${i+1}</td>
-<td colspan="4"><input id="n_${i}" value="${w.nombre||''}"></td>
-<td colspan="4"><input id="c_${i}" value="${w.cedula||''}"></td>
-<td colspan="6">
-<canvas id="firma_${i}" width="180" height="70"></canvas>
-<button onclick="limpiarFirma(${i})">X</button>
-</td>
-</tr>
-`;
+g.innerHTML+=c(1,(i+1));
+g.innerHTML+=c(3,`<input id="n_${i}" value="${w.nombre||""}">`);
+g.innerHTML+=c(3,`<input id="c_${i}" value="${w.cedula||""}">`);
+g.innerHTML+=c(5,`
+<canvas id="f_${i}" width="150" height="60"></canvas>
+<button onclick="cl(${i})">X</button>
+`);
 }
 
-workers.innerHTML=html;
-setTimeout(initFirmas,200);
+/* OBS */
+g.innerHTML+=c(12,"OBSERVACIONES");
+g.innerHTML+=c(12,`<textarea id="obs">${d.observaciones||""}</textarea>`);
+
+setTimeout(firmas,200);
 }
 
-function initFirmas(){
-
+function firmas(){
 for(let i=0;i<10;i++){
-
-let c=document.getElementById("firma_"+i);
-let ctx=c.getContext("2d");
-
+let c=document.getElementById("f_"+i);
+let x=c.getContext("2d");
 let d=false;
-
 c.onmousedown=()=>d=true;
 c.onmouseup=()=>d=false;
-
 c.onmousemove=e=>{
 if(!d)return;
-ctx.lineWidth=2;
-ctx.lineTo(e.offsetX,e.offsetY);
-ctx.stroke();
-ctx.beginPath();
-ctx.moveTo(e.offsetX,e.offsetY);
+x.lineWidth=2;
+x.lineTo(e.offsetX,e.offsetY);
+x.stroke();
+x.beginPath();
+x.moveTo(e.offsetX,e.offsetY);
 };
 }
 }
 
-function limpiarFirma(i){
-let c=document.getElementById("firma_"+i);
+function cl(i){
+let c=document.getElementById("f_"+i);
 c.getContext("2d").clearRect(0,0,c.width,c.height);
 }
 
 function cargar(){
 let s=document.createElement("script");
-s.src=URL+"?getBase=1&callback=llenar";
+s.src=URL+"?getBase=1&callback=render";
 document.body.appendChild(s);
-}
-
-function llenar(d){
-
-fecha_inicio.value=d.fecha_inicio||"";
-fecha_fin.value=d.fecha_fin||"";
-lugar.value=d.lugar||"";
-tipo_trabajo.value=d.tipo_trabajo||"";
-
-pasos.value=d.pasos||"";
-maquinas.value=d.maquinas||"";
-peligros.value=d.peligros||"";
-controles.value=d.controles||"";
-
-observaciones.value=d.observaciones||"";
-
-crearWorkers(d.workers||[]);
 }
 
 function generar(){
 
-let workersData=[];
+let w=[];
 
 for(let i=0;i<10;i++){
-
-let canvas=document.getElementById("firma_"+i);
-
-workersData.push({
+w.push({
 nombre:document.getElementById("n_"+i).value,
 cedula:document.getElementById("c_"+i).value,
-firma:canvas.toDataURL()
+firma:document.getElementById("f_"+i).toDataURL()
 });
 }
 
 let data={
-fecha_inicio:fecha_inicio.value,
-fecha_fin:fecha_fin.value,
+fecha_inicio:fi.value,
+fecha_fin:ff.value,
 lugar:lugar.value,
-tipo_trabajo:tipo_trabajo.value,
+tipo_trabajo:tipo.value,
 pasos:pasos.value,
-maquinas:maquinas.value,
-peligros:peligros.value,
-controles:controles.value,
-observaciones:observaciones.value,
-workers:workersData
+maquinas:maq.value,
+peligros:pel.value,
+controles:con.value,
+observaciones:obs.value,
+workers:w
 };
 
 let s=document.createElement("script");
