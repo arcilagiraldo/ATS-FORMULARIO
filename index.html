@@ -5,39 +5,19 @@
 <title>ATS PRO FINAL</title>
 
 <style>
-body{
-  font-family: Arial;
-  background:#0f172a;
-  color:#fff;
-  padding:20px;
-}
-.section{
-  background:#1e293b;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-}
-input,textarea{
-  width:100%;
-  margin:5px 0;
-  padding:10px;
-  background:#334155;
-  color:#fff;
-  border:none;
-}
-button{
-  padding:12px;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-}
+body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
+.section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
+input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
+button{padding:12px;background:#22c55e;border:none;border-radius:8px}
+#debug{background:#111;padding:10px;margin-bottom:10px;font-size:12px}
 </style>
 </head>
 
 <body>
 
 <h2>ATS PRO</h2>
+
+<div id="debug">Cargando datos...</div>
 
 <div class="section">
 <h3>Información General</h3>
@@ -76,8 +56,9 @@ button{
 
 <script>
 
-const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec"; // tu apps script
+const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
+// 🔥 CREAR TRABAJADORES
 function crearWorkers(lista=[]){
   let html="";
   for(let i=0;i<10;i++){
@@ -90,29 +71,40 @@ function crearWorkers(lista=[]){
   document.getElementById("workers").innerHTML = html;
 }
 
-// 🔥 CARGAR DATOS BASE DESDE APPS SCRIPT
+// 🔥 CARGAR BASE (CORREGIDO)
 async function cargarBase(){
 
-  const res = await fetch(URL + "?getBase=1");
-  const data = await res.json();
+  try{
 
-  fecha_inicio.value = data.fecha_inicio || "";
-  fecha_fin.value = data.fecha_fin || "";
-  lugar.value = data.lugar || "";
-  tipo_trabajo.value = data.tipo_trabajo || "";
+    const res = await fetch(URL + "?getBase=1");
 
-  pasos.value = data.pasos || "";
-  maquinas.value = data.maquinas || "";
-  peligros.value = data.peligros || "";
-  controles.value = data.controles || "";
+    const text = await res.text();
 
-  manuales.value = data.manuales || "";
-  electricas.value = data.electricas || "";
-  otros.value = data.otros || "";
+    const data = JSON.parse(text);
 
-  observaciones.value = data.observaciones || "";
+    document.getElementById("debug").innerText = "Datos cargados ✔";
 
-  crearWorkers(data.workers || []);
+    fecha_inicio.value = data.fecha_inicio || "";
+    fecha_fin.value = data.fecha_fin || "";
+    lugar.value = data.lugar || "";
+    tipo_trabajo.value = data.tipo_trabajo || "";
+
+    pasos.value = data.pasos || "";
+    maquinas.value = data.maquinas || "";
+    peligros.value = data.peligros || "";
+    controles.value = data.controles || "";
+
+    manuales.value = data.manuales || "";
+    electricas.value = data.electricas || "";
+    otros.value = data.otros || "";
+
+    observaciones.value = data.observaciones || "";
+
+    crearWorkers(data.workers || []);
+
+  }catch(e){
+    document.getElementById("debug").innerText = "ERROR: " + e;
+  }
 }
 
 // 🔥 ENVIAR
@@ -148,7 +140,8 @@ async function generarATS(){
     body: JSON.stringify(data)
   });
 
-  const r = await res.json();
+  const text = await res.text();
+  const r = JSON.parse(text);
 
   alert("LISTO MIGUELITO 🚀");
   window.open(r.url);
