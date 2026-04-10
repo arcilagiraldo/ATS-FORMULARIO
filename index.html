@@ -2,33 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ATS PRO FINAL</title>
+<title>ATS REAL</title>
 
 <style>
 body{
   font-family: Arial;
-  background:#0f172a;
-  color:white;
-  padding:20px;
+  margin:20px;
 }
 input,textarea{
-  width:100%;
-  margin:5px 0;
-  padding:8px;
-}
-button{
-  background:#22c55e;
-  color:white;
-  padding:10px;
-  border:none;
-  cursor:pointer;
+  width:250px;
+  margin:3px;
 }
 iframe{
-  margin-top:20px;
-  border:2px solid #ccc;
   width:100%;
   height:800px;
-  background:white;
+  margin-top:20px;
+  border:1px solid #000;
 }
 </style>
 
@@ -36,11 +25,13 @@ iframe{
 
 <body>
 
-<h2>ATS PRO (REAL)</h2>
+<h2>ATS</h2>
 
 <input id="fi" placeholder="Fecha inicio">
 <input id="ff" placeholder="Fecha fin">
 <input id="lugar" placeholder="Lugar">
+
+<br>
 
 <textarea id="tipo" placeholder="Tipo trabajo"></textarea>
 <textarea id="pasos" placeholder="Pasos"></textarea>
@@ -49,18 +40,20 @@ iframe{
 <textarea id="con" placeholder="Controles"></textarea>
 <textarea id="obs" placeholder="Observaciones"></textarea>
 
+<br><br>
+
 <button onclick="generar()">GENERAR ATS</button>
 
-<!-- 🔥 ATS REAL -->
+<!-- 🔥 ESTE ES EL ATS REAL (NO HTML INVENTADO) -->
 <iframe id="visor"
-src="https://docs.google.com/spreadsheets/d/1nb-PX8mkBM7lXFstMomjjtje1lVb_i0Q/edit?rm=minimal">
+src="https://docs.google.com/spreadsheets/d/1PvJipRBnpjakr_2Y22c3xF168m7B_SJB/preview">
 </iframe>
 
 <script>
 
 const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-// 🔹 PRECARGAR AUTOMÁTICO
+// 🔹 PRECARGA REAL
 fetch(URL+"?getBase=1")
 .then(r=>r.json())
 .then(d=>{
@@ -75,7 +68,7 @@ con.value=d.con||"";
 obs.value=d.obs||"";
 });
 
-// 🔹 GENERAR ATS
+// 🔹 GENERAR
 function generar(){
 
 const data={
@@ -96,13 +89,17 @@ body:JSON.stringify(data)
 })
 .then(r=>r.json())
 .then(r=>{
-alert("LISTO MIGUELITO 🚀");
+alert("LISTO MIGUELITO");
 
-// 🔥 ABRE EN DRIVE
+// abrir archivo real
 window.open(r.url);
 
-// 🔥 DESCARGA AUTOMÁTICA
+// descargar
 window.open(r.download);
+
+// actualizar visor al nuevo ATS
+document.getElementById("visor").src =
+"https://docs.google.com/spreadsheets/d/"+r.url.split("/d/")[1].split("/")[0]+"/preview";
 
 });
 
