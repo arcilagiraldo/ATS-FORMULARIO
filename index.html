@@ -6,31 +6,85 @@
 
 <style>
 body{background:#0f172a;margin:0;padding:20px;font-family:Arial}
-.wrap{background:#fff;padding:10px;overflow:auto}
-.grid{
-display:grid;
-grid-template-columns:80px repeat(11,120px);
-border:1px solid #000;
-}
-.cell{
-border:1px solid #000;
-font-size:11px;
-padding:3px;
-min-height:25px;
-}
-.center{display:flex;align-items:center;justify-content:center;font-weight:bold}
+.wrap{background:#fff;padding:10px}
+table{border-collapse:collapse;width:100%}
+td{border:1px solid #000;font-size:11px;padding:4px}
 input,textarea{width:100%;border:none;font-size:11px}
-textarea{resize:none;height:100%}
+textarea{resize:none;height:100px}
 canvas{border:1px solid #000;background:#fff}
 button{margin-top:15px;padding:10px 20px;background:#22c55e;border:none;border-radius:8px}
-.logo{width:70px}
 </style>
 </head>
 
 <body>
 
 <div class="wrap">
-<div class="grid" id="g"></div>
+
+<table>
+
+<tr>
+<td rowspan="3" style="width:80px">
+<img src="https://cdn-icons-png.flaticon.com/512/1048/1048946.png" width="70">
+</td>
+<td colspan="8"><b>ANÁLISIS DE TRABAJO SEGURO</b></td>
+<td colspan="4">Código: FOR-SST-04</td>
+</tr>
+
+<tr>
+<td colspan="8"></td>
+<td colspan="4">Versión: 1</td>
+</tr>
+
+<tr>
+<td colspan="8"></td>
+<td colspan="4">Vigencia: 14/02/2026</td>
+</tr>
+
+<tr>
+<td>FECHA INICIO</td>
+<td colspan="5"><input id="fi"></td>
+<td>FECHA FIN</td>
+<td colspan="5"><input id="ff"></td>
+</tr>
+
+<tr>
+<td>LUGAR</td>
+<td colspan="11"><input id="lugar"></td>
+</tr>
+
+<tr>
+<td>TIPO</td>
+<td colspan="11"><textarea id="tipo"></textarea></td>
+</tr>
+
+<tr>
+<td colspan="3">PASOS</td>
+<td colspan="3">MAQUINAS</td>
+<td colspan="3">PELIGROS</td>
+<td colspan="3">CONTROLES</td>
+</tr>
+
+<tr>
+<td colspan="3"><textarea id="pasos"></textarea></td>
+<td colspan="3"><textarea id="maq"></textarea></td>
+<td colspan="3"><textarea id="pel"></textarea></td>
+<td colspan="3"><textarea id="con"></textarea></td>
+</tr>
+
+<tr><td colspan="12"><b>TRABAJADORES</b></td></tr>
+
+<tbody id="workers"></tbody>
+
+<tr>
+<td colspan="12">OBSERVACIONES</td>
+</tr>
+
+<tr>
+<td colspan="12"><textarea id="obs"></textarea></td>
+</tr>
+
+</table>
+
 </div>
 
 <button onclick="generar()">GENERAR ATS</button>
@@ -38,108 +92,95 @@ button{margin-top:15px;padding:10px 20px;background:#22c55e;border:none;border-r
 <script>
 
 const URL="https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
-const g=document.getElementById("g");
 
-function c(span,html=""){return `<div class="cell" style="grid-column:span ${span}">${html}</div>`;}
+/* 🔹 CARGA DATOS */
+function cargar(){
+let s=document.createElement("script");
+s.src=URL+"?getBase=1&callback=llenar";
+document.body.appendChild(s);
+}
 
-function render(d={}){
+/* 🔹 LLENAR */
+function llenar(d){
 
-g.innerHTML="";
+document.getElementById("fi").value=d.fecha_inicio||"";
+document.getElementById("ff").value=d.fecha_fin||"";
+document.getElementById("lugar").value=d.lugar||"";
+document.getElementById("tipo").value=d.tipo_trabajo||"";
 
-/* HEADER */
-g.innerHTML+=c(1,`<img class="logo" src="https://cdn-icons-png.flaticon.com/512/1048/1048946.png">`);
-g.innerHTML+=c(8,"<b>ANÁLISIS DE TRABAJO SEGURO</b>");
-g.innerHTML+=c(3,"Código: FOR-SST-04");
+document.getElementById("pasos").value=d.pasos||"";
+document.getElementById("maq").value=d.maquinas||"";
+document.getElementById("pel").value=d.peligros||"";
+document.getElementById("con").value=d.controles||"";
 
-g.innerHTML+=c(9,"");
-g.innerHTML+=c(3,"Versión: 1");
+document.getElementById("obs").value=d.observaciones||"";
 
-g.innerHTML+=c(9,"");
-g.innerHTML+=c(3,"Vigencia: 14/02/2026");
+crearTrabajadores(d.workers||[]);
+}
 
-/* FECHAS */
-g.innerHTML+=c(2,"FECHA INICIO");
-g.innerHTML+=c(4,`<input id="fi" value="${d.fecha_inicio||""}">`);
-g.innerHTML+=c(2,"FECHA FIN");
-g.innerHTML+=c(4,`<input id="ff" value="${d.fecha_fin||""}">`);
+/* 🔹 TRABAJADORES */
+function crearTrabajadores(lista){
 
-/* LUGAR */
-g.innerHTML+=c(2,"LUGAR");
-g.innerHTML+=c(10,`<input id="lugar" value="${d.lugar||""}">`);
-
-/* TIPO */
-g.innerHTML+=c(2,"TIPO TRABAJO");
-g.innerHTML+=c(10,`<textarea id="tipo">${d.tipo_trabajo||""}</textarea>`);
-
-/* TITULOS */
-g.innerHTML+=c(3,"SECUENCIA");
-g.innerHTML+=c(3,"MAQUINAS");
-g.innerHTML+=c(3,"PELIGROS");
-g.innerHTML+=c(3,"CONTROLES");
-
-/* BLOQUES */
-g.innerHTML+=c(3,`<textarea id="pasos">${d.pasos||""}</textarea>`);
-g.innerHTML+=c(3,`<textarea id="maq">${d.maquinas||""}</textarea>`);
-g.innerHTML+=c(3,`<textarea id="pel">${d.peligros||""}</textarea>`);
-g.innerHTML+=c(3,`<textarea id="con">${d.controles||""}</textarea>`);
-
-/* TRABAJADORES */
-g.innerHTML+=c(12,"<b>TRABAJADORES</b>");
+let html="";
 
 for(let i=0;i<10;i++){
 
-let w=d.workers?.[i]||{};
+let w=lista[i]||{};
 
-g.innerHTML+=c(1,(i+1));
-g.innerHTML+=c(3,`<input id="n_${i}" value="${w.nombre||""}">`);
-g.innerHTML+=c(3,`<input id="c_${i}" value="${w.cedula||""}">`);
-g.innerHTML+=c(5,`
+html+=`
+<tr>
+<td>${i+1}</td>
+<td colspan="3"><input id="n_${i}" value="${w.nombre||""}"></td>
+<td colspan="3"><input id="c_${i}" value="${w.cedula||""}"></td>
+<td colspan="5">
 <canvas id="f_${i}" width="150" height="60"></canvas>
-<button onclick="cl(${i})">X</button>
-`);
+<button onclick="limpiar(${i})">X</button>
+</td>
+</tr>
+`;
 }
 
-/* OBS */
-g.innerHTML+=c(12,"OBSERVACIONES");
-g.innerHTML+=c(12,`<textarea id="obs">${d.observaciones||""}</textarea>`);
+document.getElementById("workers").innerHTML=html;
 
 setTimeout(firmas,200);
 }
 
+/* 🔹 FIRMAS */
 function firmas(){
+
 for(let i=0;i<10;i++){
+
 let c=document.getElementById("f_"+i);
-let x=c.getContext("2d");
+let ctx=c.getContext("2d");
+
 let d=false;
+
 c.onmousedown=()=>d=true;
 c.onmouseup=()=>d=false;
+
 c.onmousemove=e=>{
 if(!d)return;
-x.lineWidth=2;
-x.lineTo(e.offsetX,e.offsetY);
-x.stroke();
-x.beginPath();
-x.moveTo(e.offsetX,e.offsetY);
+ctx.lineWidth=2;
+ctx.lineTo(e.offsetX,e.offsetY);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(e.offsetX,e.offsetY);
 };
 }
 }
 
-function cl(i){
+function limpiar(i){
 let c=document.getElementById("f_"+i);
 c.getContext("2d").clearRect(0,0,c.width,c.height);
 }
 
-function cargar(){
-let s=document.createElement("script");
-s.src=URL+"?getBase=1&callback=render";
-document.body.appendChild(s);
-}
-
+/* 🔹 GENERAR */
 function generar(){
 
 let w=[];
 
 for(let i=0;i<10;i++){
+
 w.push({
 nombre:document.getElementById("n_"+i).value,
 cedula:document.getElementById("c_"+i).value,
