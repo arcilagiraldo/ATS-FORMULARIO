@@ -1,217 +1,56 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>ATS FINAL</title>
-
-<style>
-body{background:#0f172a;margin:0;padding:20px;font-family:Arial}
-.wrap{background:#fff;padding:10px}
-table{border-collapse:collapse;width:100%}
-td{border:1px solid #000;font-size:11px;padding:4px}
-input,textarea{width:100%;border:none;font-size:11px}
-textarea{resize:none;height:100px}
-canvas{border:1px solid #000;background:#fff}
-button{margin-top:15px;padding:10px 20px;background:#22c55e;border:none;border-radius:8px}
-</style>
+<title>ATS</title>
 </head>
 
 <body>
 
-<div class="wrap">
+<h2>ATS</h2>
 
-<table>
+<input id="fi" placeholder="Fecha inicio">
+<input id="ff" placeholder="Fecha fin">
+<input id="lugar" placeholder="Lugar">
 
-<tr>
-<td rowspan="3" style="width:80px">
-<img src="https://cdn-icons-png.flaticon.com/512/1048/1048946.png" width="70">
-</td>
-<td colspan="8"><b>ANÁLISIS DE TRABAJO SEGURO</b></td>
-<td colspan="4">Código: FOR-SST-04</td>
-</tr>
+<textarea id="tipo"></textarea>
+<textarea id="pasos"></textarea>
+<textarea id="maq"></textarea>
+<textarea id="pel"></textarea>
+<textarea id="con"></textarea>
+<textarea id="obs"></textarea>
 
-<tr>
-<td colspan="8"></td>
-<td colspan="4">Versión: 1</td>
-</tr>
-
-<tr>
-<td colspan="8"></td>
-<td colspan="4">Vigencia: 14/02/2026</td>
-</tr>
-
-<tr>
-<td>FECHA INICIO</td>
-<td colspan="5"><input id="fi"></td>
-<td>FECHA FIN</td>
-<td colspan="5"><input id="ff"></td>
-</tr>
-
-<tr>
-<td>LUGAR</td>
-<td colspan="11"><input id="lugar"></td>
-</tr>
-
-<tr>
-<td>TIPO</td>
-<td colspan="11"><textarea id="tipo"></textarea></td>
-</tr>
-
-<tr>
-<td colspan="3">PASOS</td>
-<td colspan="3">MAQUINAS</td>
-<td colspan="3">PELIGROS</td>
-<td colspan="3">CONTROLES</td>
-</tr>
-
-<tr>
-<td colspan="3"><textarea id="pasos"></textarea></td>
-<td colspan="3"><textarea id="maq"></textarea></td>
-<td colspan="3"><textarea id="pel"></textarea></td>
-<td colspan="3"><textarea id="con"></textarea></td>
-</tr>
-
-<tr><td colspan="12"><b>TRABAJADORES</b></td></tr>
-
-<tbody id="workers"></tbody>
-
-<tr>
-<td colspan="12">OBSERVACIONES</td>
-</tr>
-
-<tr>
-<td colspan="12"><textarea id="obs"></textarea></td>
-</tr>
-
-</table>
-
-</div>
-
-<button onclick="generar()">GENERAR ATS</button>
+<button onclick="enviar()">GENERAR ATS</button>
 
 <script>
 
-const URL="https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+const URL="TU_URL_GAS";
 
-/* 🔹 CARGA DATOS */
-function cargar(){
-let s=document.createElement("script");
-s.src=URL+"?getBase=1&callback=llenar";
-document.body.appendChild(s);
-}
-
-/* 🔹 LLENAR */
-function llenar(d){
-
-document.getElementById("fi").value=d.fecha_inicio||"";
-document.getElementById("ff").value=d.fecha_fin||"";
-document.getElementById("lugar").value=d.lugar||"";
-document.getElementById("tipo").value=d.tipo_trabajo||"";
-
-document.getElementById("pasos").value=d.pasos||"";
-document.getElementById("maq").value=d.maquinas||"";
-document.getElementById("pel").value=d.peligros||"";
-document.getElementById("con").value=d.controles||"";
-
-document.getElementById("obs").value=d.observaciones||"";
-
-crearTrabajadores(d.workers||[]);
-}
-
-/* 🔹 TRABAJADORES */
-function crearTrabajadores(lista){
-
-let html="";
-
-for(let i=0;i<10;i++){
-
-let w=lista[i]||{};
-
-html+=`
-<tr>
-<td>${i+1}</td>
-<td colspan="3"><input id="n_${i}" value="${w.nombre||""}"></td>
-<td colspan="3"><input id="c_${i}" value="${w.cedula||""}"></td>
-<td colspan="5">
-<canvas id="f_${i}" width="150" height="60"></canvas>
-<button onclick="limpiar(${i})">X</button>
-</td>
-</tr>
-`;
-}
-
-document.getElementById("workers").innerHTML=html;
-
-setTimeout(firmas,200);
-}
-
-/* 🔹 FIRMAS */
-function firmas(){
-
-for(let i=0;i<10;i++){
-
-let c=document.getElementById("f_"+i);
-let ctx=c.getContext("2d");
-
-let d=false;
-
-c.onmousedown=()=>d=true;
-c.onmouseup=()=>d=false;
-
-c.onmousemove=e=>{
-if(!d)return;
-ctx.lineWidth=2;
-ctx.lineTo(e.offsetX,e.offsetY);
-ctx.stroke();
-ctx.beginPath();
-ctx.moveTo(e.offsetX,e.offsetY);
-};
-}
-}
-
-function limpiar(i){
-let c=document.getElementById("f_"+i);
-c.getContext("2d").clearRect(0,0,c.width,c.height);
-}
-
-/* 🔹 GENERAR */
-function generar(){
-
-let w=[];
-
-for(let i=0;i<10;i++){
-
-w.push({
-nombre:document.getElementById("n_"+i).value,
-cedula:document.getElementById("c_"+i).value,
-firma:document.getElementById("f_"+i).toDataURL()
-});
-}
+function enviar(){
 
 let data={
-fecha_inicio:fi.value,
-fecha_fin:ff.value,
+fi:fi.value,
+ff:ff.value,
 lugar:lugar.value,
-tipo_trabajo:tipo.value,
+tipo:tipo.value,
 pasos:pasos.value,
-maquinas:maq.value,
-peligros:pel.value,
-controles:con.value,
-observaciones:obs.value,
-workers:w
+maq:maq.value,
+pel:pel.value,
+con:con.value,
+obs:obs.value
 };
 
-let s=document.createElement("script");
-s.src=URL+"?postData="+encodeURIComponent(JSON.stringify(data))+"&callback=fin";
-document.body.appendChild(s);
-}
-
-function fin(r){
+fetch(URL,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(r=>r.json())
+.then(r=>{
 alert("LISTO MIGUELITO 🚀");
 window.open(r.url);
-}
+});
 
-cargar();
+}
 
 </script>
 
