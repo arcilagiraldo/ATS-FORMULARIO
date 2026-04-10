@@ -8,16 +8,15 @@
 body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
 .section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
 input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
-button{padding:12px;background:#22c55e;border:none;border-radius:8px;margin-top:10px}
-canvas{background:#fff;border-radius:8px}
+button{padding:10px;background:#22c55e;border:none;border-radius:6px;margin-top:5px}
+canvas{background:#fff;border-radius:6px;margin-top:5px}
 </style>
 </head>
 
 <body>
 
 <h2>ATS PRO</h2>
-
-<div id="estado">Cargando datos...</div>
+<div id="estado">Cargando...</div>
 
 <div class="section">
 <h3>Información General</h3>
@@ -36,10 +35,8 @@ canvas{background:#fff;border-radius:8px}
 </div>
 
 <div class="section">
-<h3>Firma Digital</h3>
-<canvas id="firma" width="300" height="150"></canvas>
-<br>
-<button onclick="limpiarFirma()">Limpiar firma</button>
+<h3>Trabajadores + Firma</h3>
+<div id="workers"></div>
 </div>
 
 <button onclick="generarATS()">Generar ATS</button>
@@ -48,53 +45,104 @@ canvas{background:#fff;border-radius:8px}
 
 const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-// 🔥 FIRMA
-const canvas = document.getElementById("firma");
-const ctx = canvas.getContext("2d");
+let firmas = {};
 
-let dibujando = false;
+function crearWorkers(lista=[]){
 
-canvas.addEventListener("mousedown",()=>dibujando=true);
-canvas.addEventListener("mouseup",()=>dibujando=false);
-canvas.addEventListener("mousemove",dibujar);
+  let html = "";
 
-function dibujar(e){
-  if(!dibujando) return;
-  ctx.lineWidth = 2;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "black";
-  ctx.lineTo(e.offsetX, e.offsetY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(e.offsetX, e.offsetY);
+  for(let i=0;i<10;i++){
+
+    let w = lista[i] || {};
+
+    html += `
+      <div style="margin-bottom:15px;border-bottom:1px solid #555;padding-bottom:10px;">
+        <input id="n_${i}" value="${w.nombre||''}" placeholder="Nombre">
+        <input id="c_${i}" value="${w.cedula||''}" placeholder="Cédula">
+
+        <canvas id="firma_${i}" width="250" height="120"></canvas>
+        <br>
+        <button onclick="limpiarFirma(${i})">Limpiar firma</button>
+      </div>
+    `;
+  }
+
+  document.getElementById("workers").innerHTML = html;
+
+  setTimeout(initFirmas,200);
 }
 
-function limpiarFirma(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+// 🔥 ACTIVAR FIRMAS
+function initFirmas(){
+
+  for(let i=0;i<10;i++){
+
+    const canvas = document.getElementById("firma_"+i);
+    const ctx = canvas.getContext("2d");
+
+    let dibujando=false;
+
+    canvas.onmousedown=()=>dibujando=true;
+    canvas.onmouseup=()=>dibujando=false;
+
+    canvas.onmousemove=(e)=>{
+      if(!dibujando)return;
+      ctx.lineWidth=2;
+      ctx.lineCap="round";
+      ctx.lineTo(e.offsetX,e.offsetY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX,e.offsetY);
+    };
+  }
 }
 
-// 🔥 JSONP BASE
+function limpiarFirma(i){
+  const c=document.getElementById("firma_"+i);
+  c.getContext("2d").clearRect(0,0,c.width,c.height);
+}
+
+// 🔥 CARGAR BASE
 function cargarBase(){
-  const s = document.createElement("script");
-  s.src = URL + "?getBase=1&callback=llenar";
+  const s=document.createElement("script");
+  s.src=URL+"?getBase=1&callback=llenar";
   document.body.appendChild(s);
 }
 
 function llenar(data){
+
   estado.innerText="Datos cargados ✔";
 
   fecha_inicio.value=data.fecha_inicio||"";
   fecha_fin.value=data.fecha_fin||"";
   lugar.value=data.lugar||"";
   tipo_trabajo.value=data.tipo_trabajo||"";
+
+  pasos.value=data.pasos||"";
+  maquinas.value=data.maquinas||"";
+  peligros.value=data.peligros||"";
+  controles.value=data.controles||"";
+
+  crearWorkers(data.workers||[]);
 }
 
-// 🔥 ENVIAR
+// 🔥 GENERAR ATS
 function generarATS(){
 
-  const firmaBase64 = canvas.toDataURL("image/png");
+  const workers=[];
 
-  const data = {
+  for(let i=0;i<10;i++){
+
+    const canvas=document.getElementById("firma_"+i);
+
+    workers.push({
+      nombre:document.getElementById("n_"+i).value,
+      cedula:document.getElementById("c_"+i).value,
+      firma:canvas.toDataURL("image/png")
+    });
+  }
+
+  const data={
     fecha_inicio:fecha_inicio.value,
     fecha_fin:fecha_fin.value,
     lugar:lugar.value,
@@ -103,11 +151,11 @@ function generarATS(){
     maquinas:maquinas.value,
     peligros:peligros.value,
     controles:controles.value,
-    firma:firmaBase64
+    workers
   };
 
-  const s = document.createElement("script");
-  s.src = URL + "?postData=" + encodeURIComponent(JSON.stringify(data)) + "&callback=fin";
+  const s=document.createElement("script");
+  s.src=URL+"?postData="+encodeURIComponent(JSON.stringify(data))+"&callback=fin";
   document.body.appendChild(s);
 }
 
