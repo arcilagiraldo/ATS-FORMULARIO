@@ -9,7 +9,6 @@ body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
 .section{background:#1e293b;padding:15px;margin-bottom:15px;border-radius:10px}
 input,textarea{width:100%;margin:5px 0;padding:10px;background:#334155;color:#fff;border:none}
 button{padding:12px;background:#22c55e;border:none;border-radius:8px}
-#debug{background:#111;padding:10px;margin-bottom:10px;font-size:12px}
 </style>
 </head>
 
@@ -17,7 +16,7 @@ button{padding:12px;background:#22c55e;border:none;border-radius:8px}
 
 <h2>ATS PRO</h2>
 
-<div id="debug">Cargando datos...</div>
+<div id="estado">Cargando datos...</div>
 
 <div class="section">
 <h3>Información General</h3>
@@ -71,44 +70,39 @@ function crearWorkers(lista=[]){
   document.getElementById("workers").innerHTML = html;
 }
 
-// 🔥 CARGAR BASE (CORREGIDO)
-async function cargarBase(){
+// 🔥 JSONP (SIN CORS)
+function cargarBase(){
+  const script = document.createElement("script");
+  script.src = URL + "?getBase=1&callback=llenarFormulario";
+  document.body.appendChild(script);
+}
 
-  try{
+// 🔥 FUNCIÓN CALLBACK
+function llenarFormulario(data){
 
-    const res = await fetch(URL + "?getBase=1");
+  document.getElementById("estado").innerText = "Datos cargados ✔";
 
-    const text = await res.text();
+  fecha_inicio.value = data.fecha_inicio || "";
+  fecha_fin.value = data.fecha_fin || "";
+  lugar.value = data.lugar || "";
+  tipo_trabajo.value = data.tipo_trabajo || "";
 
-    const data = JSON.parse(text);
+  pasos.value = data.pasos || "";
+  maquinas.value = data.maquinas || "";
+  peligros.value = data.peligros || "";
+  controles.value = data.controles || "";
 
-    document.getElementById("debug").innerText = "Datos cargados ✔";
+  manuales.value = data.manuales || "";
+  electricas.value = data.electricas || "";
+  otros.value = data.otros || "";
 
-    fecha_inicio.value = data.fecha_inicio || "";
-    fecha_fin.value = data.fecha_fin || "";
-    lugar.value = data.lugar || "";
-    tipo_trabajo.value = data.tipo_trabajo || "";
+  observaciones.value = data.observaciones || "";
 
-    pasos.value = data.pasos || "";
-    maquinas.value = data.maquinas || "";
-    peligros.value = data.peligros || "";
-    controles.value = data.controles || "";
-
-    manuales.value = data.manuales || "";
-    electricas.value = data.electricas || "";
-    otros.value = data.otros || "";
-
-    observaciones.value = data.observaciones || "";
-
-    crearWorkers(data.workers || []);
-
-  }catch(e){
-    document.getElementById("debug").innerText = "ERROR: " + e;
-  }
+  crearWorkers(data.workers || []);
 }
 
 // 🔥 ENVIAR
-async function generarATS(){
+function generarATS(){
 
   const workers = [];
 
@@ -135,14 +129,13 @@ async function generarATS(){
     workers
   };
 
-  const res = await fetch(URL,{
-    method:"POST",
-    body: JSON.stringify(data)
-  });
+  const script = document.createElement("script");
+  script.src = URL + "?postData=" + encodeURIComponent(JSON.stringify(data)) + "&callback=respuestaFinal";
+  document.body.appendChild(script);
+}
 
-  const text = await res.text();
-  const r = JSON.parse(text);
-
+// 🔥 RESPUESTA FINAL
+function respuestaFinal(r){
   alert("LISTO MIGUELITO 🚀");
   window.open(r.url);
 }
