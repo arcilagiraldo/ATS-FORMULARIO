@@ -13,31 +13,35 @@
 <input id="ff" placeholder="Fecha fin">
 <input id="lugar" placeholder="Lugar">
 
-<textarea id="tipo"></textarea>
-<textarea id="pasos"></textarea>
-<textarea id="maq"></textarea>
-<textarea id="pel"></textarea>
-<textarea id="con"></textarea>
-<textarea id="obs"></textarea>
+<br><br>
+
+<textarea id="tipo" placeholder="Tipo trabajo"></textarea>
+<textarea id="pasos" placeholder="Pasos"></textarea>
+<textarea id="maq" placeholder="Maquinas"></textarea>
+<textarea id="pel" placeholder="Peligros"></textarea>
+<textarea id="con" placeholder="Controles"></textarea>
+<textarea id="obs" placeholder="Observaciones"></textarea>
+
+<br><br>
 
 <button onclick="enviar()">GENERAR ATS</button>
 
 <script>
 
-const URL="TU_URL_GAS";
+const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
 function enviar(){
 
-let data={
-fi:fi.value,
-ff:ff.value,
-lugar:lugar.value,
-tipo:tipo.value,
-pasos:pasos.value,
-maq:maq.value,
-pel:pel.value,
-con:con.value,
-obs:obs.value
+const data = {
+fi: document.getElementById("fi").value,
+ff: document.getElementById("ff").value,
+lugar: document.getElementById("lugar").value,
+tipo: document.getElementById("tipo").value,
+pasos: document.getElementById("pasos").value,
+maq: document.getElementById("maq").value,
+pel: document.getElementById("pel").value,
+con: document.getElementById("con").value,
+obs: document.getElementById("obs").value
 };
 
 fetch(URL,{
