@@ -1,111 +1,1203 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>ATS REAL</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS — Análisis de Trabajo Seguro</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body{
-  font-family: Arial;
-  margin:20px;
-}
-input,textarea{
-  width:250px;
-  margin:3px;
-}
-iframe{
-  width:100%;
-  height:800px;
-  margin-top:20px;
-  border:1px solid #000;
-}
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2436;
+    --border: #2a3050;
+    --border-light: #3a4570;
+    --accent: #f59e0b;
+    --accent2: #10b981;
+    --danger: #ef4444;
+    --text: #e8eaf0;
+    --text-muted: #8892b0;
+    --text-dim: #4a5578;
+    --green: #10b981;
+    --red: #ef4444;
+    --blue: #60a5fa;
+    --radius: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .app-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .app-header .logo .badge {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .app-header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  .app-header .subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .header-actions { display: flex; gap: 10px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    padding: 7px 14px;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-light); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .btn-icon { font-size: 16px; }
+
+  /* ── LAYOUT ── */
+  .app-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header:hover { background: var(--border); }
+  .section-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .section-chevron {
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+  .section.collapsed .section-chevron { transform: rotate(-90deg); }
+  .section-body {
+    padding: 20px;
+    display: grid;
+    gap: 16px;
+  }
+  .section.collapsed .section-body { display: none; }
+
+  /* ── FORM ELEMENTS ── */
+  .field-group {
+    display: grid;
+    gap: 6px;
+  }
+  .field-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .field-group input,
+  .field-group textarea,
+  .field-group select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 14px;
+    transition: border-color 0.15s;
+    width: 100%;
+    resize: vertical;
+  }
+  .field-group input:focus,
+  .field-group textarea:focus,
+  .field-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+  }
+  .field-group textarea { min-height: 80px; line-height: 1.5; }
+  .field-group textarea.tall { min-height: 140px; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  /* ── CHECKBOX GRID ── */
+  .cb-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .cb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .cb-item:hover { border-color: var(--border-light); background: var(--surface2); }
+  .cb-item.checked {
+    border-color: var(--accent2);
+    background: rgba(16,185,129,0.08);
+  }
+  .cb-item input[type=checkbox] { display: none; }
+  .cb-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-light);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 11px;
+    font-weight: 700;
+    color: transparent;
+  }
+  .cb-item.checked .cb-box {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+  .cb-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+  .cb-item.checked .cb-label { color: var(--text); }
+
+  /* ── RADIO GROUP (SI / NO / N.A.) ── */
+  .radio-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .radio-question {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding-top: 2px;
+  }
+  .radio-options {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .radio-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .radio-opt input { display: none; }
+  .radio-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: var(--surface);
+    transition: all 0.15s;
+    min-width: 36px;
+    text-align: center;
+  }
+  .radio-opt.si-opt input:checked ~ .radio-pill { background: var(--green); border-color: var(--green); color: #fff; }
+  .radio-opt.no-opt input:checked ~ .radio-pill { background: var(--red); border-color: var(--red); color: #fff; }
+  .radio-opt.na-opt input:checked ~ .radio-pill { background: var(--text-dim); border-color: var(--text-dim); color: #fff; }
+
+  /* ── WORKERS TABLE ── */
+  .workers-table { width: 100%; border-collapse: collapse; }
+  .workers-table th {
+    background: var(--surface2);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .workers-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .workers-table tr:last-child td { border-bottom: none; }
+  .workers-table td:first-child {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    width: 40px;
+    text-align: center;
+  }
+  .workers-table input {
+    background: var(--bg);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  .workers-table input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+  }
+  .status-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── OVERLAY / MODAL ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.active { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .modal-icon { font-size: 48px; margin-bottom: 16px; }
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+  .modal a { color: var(--accent); }
+
+  /* ── LOADING SPINNER ── */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(245,158,11,0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DIVIDER WITH LABEL ── */
+  .divider-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    margin: 4px 0 8px;
+  }
+  .divider-label::before, .divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    font-size: 13px;
+    z-index: 300;
+    transform: translateX(120%);
+    transition: transform 0.3s;
+    box-shadow: var(--shadow);
+    max-width: 320px;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid var(--red); }
+  .toast.info { border-left: 4px solid var(--blue); }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .app-header { padding: 12px 16px; }
+    .app-body { padding: 16px 12px 80px; }
+    .header-actions .btn { padding: 8px 12px; font-size: 12px; }
+    .status-bar { padding: 10px 16px; }
+  }
 </style>
-
 </head>
-
 <body>
 
-<h2>ATS</h2>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="logo">
+    <span class="badge">ATS</span>
+    <div>
+      <h1>Análisis de Trabajo Seguro</h1>
+      <div class="subtitle">FOR-SST-04 · Versión 1 · 14/02/2026</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="resetForm()">↺ Restablecer</button>
+    <button class="btn btn-primary" onclick="generarATS()" id="btnGenerar">
+      <span class="btn-icon">⚡</span> Generar ATS
+    </button>
+  </div>
+</header>
 
-<input id="fi" placeholder="Fecha inicio">
-<input id="ff" placeholder="Fecha fin">
-<input id="lugar" placeholder="Lugar">
+<!-- MAIN -->
+<main class="app-body">
 
-<br>
+  <!-- ① DATOS GENERALES -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-num">1</div>
+      <div class="section-title">Datos Generales</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-3">
+        <div class="field-group">
+          <label>Fecha Inicio Actividad</label>
+          <input type="date" id="fi" value="2026-04-01">
+        </div>
+        <div class="field-group">
+          <label>Fecha Fin Actividad</label>
+          <input type="date" id="ff" value="2026-04-30">
+        </div>
+        <div class="field-group">
+          <label>Lugar</label>
+          <input type="text" id="lugar" placeholder="Ej: Sector Norte - Vía principal" value="ORNATO AAPLCO">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Tipo de Trabajo</label>
+        <textarea id="tipo" rows="2">Roseria, guadaña, limpieza de cunetas, fertilización y mantenimiento de jardines, traslado cargue y descargue de los residuos de las actividades</textarea>
+      </div>
+    </div>
+  </div>
 
-<textarea id="tipo" placeholder="Tipo trabajo"></textarea>
-<textarea id="pasos" placeholder="Pasos"></textarea>
-<textarea id="maq" placeholder="Máquinas"></textarea>
-<textarea id="pel" placeholder="Peligros"></textarea>
-<textarea id="con" placeholder="Controles"></textarea>
-<textarea id="obs" placeholder="Observaciones"></textarea>
+  <!-- ② ANÁLISIS DE TRABAJO -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-num">2</div>
+      <div class="section-title">Análisis de Trabajo Seguro — ATS</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field-group">
+          <label>Secuencia Ordenada de Pasos (Procedimiento)</label>
+          <textarea id="pasos" class="tall">las labores inician a las 7 am el personal se presenta en su respectivo lugar de trabajo , están divididos en dos cuadrillas, de tres personas cada una y de acuerdo a la demanda y los requerimientos del supervisor, van rotando por los diferentes sectores avanzando cada uno en las labores que se necesiten en ese sitio especifico.</textarea>
+        </div>
+        <div class="field-group">
+          <label>Máquinas o Herramientas a Utilizar</label>
+          <textarea id="maq" class="tall">guadañas, motosierra, sopladoras a gasolina tipo mochila, corta setos, machetes, rastrillos, pala, palin, gambia, deshojador</textarea>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field-group">
+          <label>Peligro y/o Consecuencias</label>
+          <textarea id="pel" class="tall">Biomecánico: posturas mantenidas bípedas, movimientos repetitivos, malas posturas, manipulación manual de cargas.
+Condiciones de seguridad-locativo: superficie de trabajo con diferentes niveles.
+Mecánico: por atrapamiento y corte entre y con partes, golpes con elementos.
+Físico: Ruido de las herramientas eléctricas. Temperaturas extremas o cambio climático.</textarea>
+        </div>
+        <div class="field-group">
+          <label>Controles Requeridos (Preventivos, Protectivos y Reactivos)</label>
+          <textarea id="con" class="tall">Uso adecuado de EPP (Casco de seguridad, protector auditivo, gafas o caretas de seguridad, botas de seguridad, Protección respiratoria, delantal cuero, arcnes).
+Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<br><br>
+  <!-- ③ EPP Y SISTEMAS DE PROTECCIÓN -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-num">3</div>
+      <div class="section-title">Elementos de Protección Personal y Sistemas de Protección Contra Caídas</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="divider-label">EPP básico</div>
+      <div class="grid-3" id="epp-grid">
+        <!-- Col A -->
+        <div style="display:grid;gap:8px">
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A12"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Casco con Barbuquejo</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A13"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Gafas de Seguridad</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A14"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Guantes</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A15"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Protección Auditiva</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A16"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Protección Respiratoria</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A17"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Botas Antideslizantes</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="A18"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Arnés de Cuerpo Completo (Multipropósito o Dieléctrico)</span></div>
+        </div>
+        <!-- Col J -->
+        <div style="display:grid;gap:8px">
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J12"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Eslinga con Absorbedor de Impactos</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J13"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Eslinga de Posicionamiento</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J14"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Mosquetón de Cierre Automático</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J15"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Anclaje Portátil (Tie Off)</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J16"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Línea de Vida Portátil</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J17"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Pretales</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="J18"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Descendedores</span></div>
+        </div>
+        <!-- Col Q -->
+        <div style="display:grid;gap:8px">
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="Q12"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Kit de Rescate</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="Q13"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Autorretráctil</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="Q14"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Silla para Trabajo en Suspensión</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="Q15"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Andamios</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="Q16"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Escalera Extensible</span></div>
+          <div class="cb-item checked" onclick="toggleCb(this)" data-cell="Q17"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Escalera Tijera</span></div>
+          <div class="cb-item" onclick="toggleCb(this)" data-cell="Q18"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Otro(s)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<button onclick="generar()">GENERAR ATS</button>
+  <!-- ④ EQUIPOS Y HERRAMIENTAS -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-num">4</div>
+      <div class="section-title">Equipos y Herramientas a Utilizar</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field-group"><label>Manuales</label><input type="text" id="h_manuales" value="machetes, palas, palines, gambias, serrucho"></div>
+        <div class="field-group"><label>Eléctricas</label><input type="text" id="h_electricas" value=""></div>
+        <div class="field-group"><label>Neumáticas</label><input type="text" id="h_neumaticas" value=""></div>
+        <div class="field-group"><label>Hidráulicas</label><input type="text" id="h_hidraulicas" value=""></div>
+        <div class="field-group"><label>Mecánicas</label><input type="text" id="h_mecanicas" value=""></div>
+        <div class="field-group"><label>Otras</label><input type="text" id="h_otras" value=""></div>
+      </div>
+    </div>
+  </div>
 
-<!-- 🔥 ESTE ES EL ATS REAL (NO HTML INVENTADO) -->
-<iframe id="visor"
-src="https://docs.google.com/spreadsheets/d/1PvJipRBnpjakr_2Y22c3xF168m7B_SJB/preview">
-</iframe>
+  <!-- ⑤ PREPARACIÓN DEL ÁREA -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-num">5</div>
+      <div class="section-title">Preparación del Área</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body" style="gap:8px">
+      <div id="prep-items">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ EVALUACIÓN DEL RIESGO -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-num">6</div>
+      <div class="section-title">Evaluación del Riesgo — Riesgos Potenciales</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-4" id="riesgos-grid"></div>
+      <div class="field-group" style="margin-top:8px">
+        <label>Describa Otros Riesgos</label>
+        <input type="text" id="otros_riesgos" placeholder="Otros riesgos no listados...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ CONTROL DE RIESGOS -->
+  <div class="section" id="s7">
+    <div class="section-header" onclick="toggleSection('s7')">
+      <div class="section-num">7</div>
+      <div class="section-title">Control de Riesgos / Plan de Emergencias</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-4" id="controles-grid"></div>
+    </div>
+  </div>
+
+  <!-- ⑧ EQUIPO DE SEGURIDAD -->
+  <div class="section" id="s8">
+    <div class="section-header" onclick="toggleSection('s8')">
+      <div class="section-num">8</div>
+      <div class="section-title">Equipo de Seguridad Requerido</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-4" id="equipo-grid"></div>
+    </div>
+  </div>
+
+  <!-- ⑨ TRABAJADORES -->
+  <div class="section" id="s9">
+    <div class="section-header" onclick="toggleSection('s9')">
+      <div class="section-num">9</div>
+      <div class="section-title">Firma de Trabajadores (Ejecutores)</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <table class="workers-table">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Nombre Completo</th>
+            <th>Cédula</th>
+          </tr>
+        </thead>
+        <tbody id="workers-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑩ RESPONSABLES Y OBSERVACIONES -->
+  <div class="section" id="s10">
+    <div class="section-header" onclick="toggleSection('s10')">
+      <div class="section-num">10</div>
+      <div class="section-title">Responsables y Observaciones</div>
+      <span class="section-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-3">
+        <div class="field-group">
+          <label>Responsable SST</label>
+          <input type="text" id="resp_sst" value="Yenny Moreno">
+        </div>
+        <div class="field-group">
+          <label>Firma Ingeniero</label>
+          <input type="text" id="firma_ing" value="Juan Diego Martinez">
+        </div>
+        <div class="field-group">
+          <label>Firma Encargado</label>
+          <input type="text" id="firma_enc" value="Edwin Marin">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Líneas de Emergencia</label>
+        <textarea id="lineas_emergencia" rows="2">LÍNEA DE EMERGENCIA: 3117949067     LÍNEA DE CENTRAL: 3113363911     OTRA LÍNEA: 3136236318</textarea>
+      </div>
+      <div class="field-group">
+        <label>Observaciones</label>
+        <textarea id="obs" rows="3" placeholder="Observaciones adicionales..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-info">
+    <div class="status-dot"></div>
+    <span id="status-text">Formulario listo — Revise y edite los datos antes de generar</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-secondary" onclick="generarATS()" id="btnGenerar2">
+      <span class="btn-icon">⚡</span> Generar y Guardar en Drive
+    </button>
+  </div>
+</div>
+
+<!-- OVERLAY LOADING -->
+<div class="overlay" id="overlay-loading">
+  <div class="modal">
+    <div class="modal-icon">⚙️</div>
+    <h2>Generando ATS...</h2>
+    <p>Creando copia en Google Drive con todos los datos, logos y formato original.<br>Esto puede tardar unos segundos.</p>
+    <div style="display:flex;justify-content:center"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- OVERLAY SUCCESS -->
+<div class="overlay" id="overlay-success">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <h2>¡ATS Generado!</h2>
+    <p id="success-msg">El archivo fue creado exitosamente en Google Drive.</p>
+    <div class="modal-actions">
+      <a id="btn-open-drive" href="#" target="_blank" class="btn btn-primary">📂 Abrir en Drive</a>
+      <a id="btn-download" href="#" target="_blank" class="btn btn-secondary">⬇ Descargar</a>
+      <button class="btn btn-ghost" onclick="closeOverlay('overlay-success')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY ERROR -->
+<div class="overlay" id="overlay-error">
+  <div class="modal">
+    <div class="modal-icon">❌</div>
+    <h2>Error al Generar</h2>
+    <p id="error-msg">Ocurrió un problema al conectar con Google Apps Script.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeOverlay('overlay-error')">Reintentar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURACIÓN — Solo cambia esta URL si redesplegás el GAS
+// ═══════════════════════════════════════════════════════
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
 
-const URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+// ═══════════════════════════════════════════════════════
+// DATOS: Preparación del Área
+// ═══════════════════════════════════════════════════════
+const PREP_ITEMS = [
+  { id:'p28', col_s:'S28', col_u:'U28', col_v:'V28', label:'Se ha instalado señalización preventiva que delimite el área de trabajo (cinta, conos, señales tubulares o polisombras)', default:'SI' },
+  { id:'p29', col_s:'S29', col_u:'U29', col_v:'V29', label:'El trabajo en alturas mínimo lo van a realizar dos trabajadores o ejecutores', default:'NA' },
+  { id:'p30', col_s:'S30', col_u:'U30', col_v:'V30', label:'Los trabajadores tienen formación en la actividad a desarrollar', default:'SI' },
+  { id:'p31', col_s:'S31', col_u:'U31', col_v:'V31', label:'Los trabajadores están aptos para desarrollar la labor (estado de salud y con concepto médico vigente)', default:'SI' },
+  { id:'p32', col_s:'S32', col_u:'U32', col_v:'V32', label:'Los equipos de protección a utilizar en la labor se encuentran en buenas condiciones', default:'SI' },
+  { id:'p33', col_s:'S33', col_u:'U33', col_v:'V33', label:'Los elementos de protección personal a utilizar en la labor se encuentran en buenas condiciones', default:'SI' },
+  { id:'p34', col_s:'S34', col_u:'U34', col_v:'V34', label:'Los trabajadores revisan los accesos al área de trabajo y los requerimientos de rescate en caso de emergencia', default:'SI' },
+  { id:'p35', col_s:'S35', col_u:'U35', col_v:'V35', label:'Los trabajadores realizan el análisis de trabajo seguro y lo socializan antes de iniciar la labor', default:'SI' },
+  { id:'p36', col_s:'S36', col_u:'U36', col_v:'V36', label:'El lugar donde realizará la tarea tiene instalada la línea de vida o una estructura donde el trabajador puede asegurarse', default:'NA' },
+  { id:'p37', col_s:'S37', col_u:'U37', col_v:'V37', label:'Se tienen en cuenta medidas de trabajo seguras para adelantar labores en cercanías a líneas y/o equipos eléctricos energizados', default:'NA' },
+  { id:'p38', col_s:'S38', col_u:'U38', col_v:'V38', label:'En caso de trabajar en espacios confinados o trabajos en caliente, se realizan las consultas preventivas respectivas', default:'SI' },
+];
 
-// 🔹 PRECARGA REAL
-fetch(URL+"?getBase=1")
-.then(r=>r.json())
-.then(d=>{
-fi.value=d.fi||"";
-ff.value=d.ff||"";
-lugar.value=d.lugar||"";
-tipo.value=d.tipo||"";
-pasos.value=d.pasos||"";
-maq.value=d.maq||"";
-pel.value=d.pel||"";
-con.value=d.con||"";
-obs.value=d.obs||"";
+// ═══════════════════════════════════════════════════════
+// DATOS: Riesgos Potenciales
+// ═══════════════════════════════════════════════════════
+const RIESGOS = [
+  { cell:'C42', label:'Exposición a Químicos', checked:false },
+  { cell:'H42', label:'Riesgo de Tropezones', checked:true },
+  { cell:'O42', label:'Caídas desde Altura', checked:false },
+  { cell:'U42', label:'Fuentes de Ignición', checked:true },
+  { cell:'C44', label:'Atmósferas Peligrosas', checked:false },
+  { cell:'H44', label:'Riesgos Ambientales', checked:true },
+  { cell:'O44', label:'Maquinaria Pesada', checked:true },
+  { cell:'U44', label:'Presiones Anormales', checked:false },
+  { cell:'C46', label:'Espacio Confinado', checked:false },
+  { cell:'H46', label:'Riesgos Eléctricos', checked:false },
+  { cell:'O46', label:'Exposición a Calor/Frío', checked:false },
+  { cell:'U46', label:'Izaje de Cargas', checked:false },
+  { cell:'C48', label:'Ruido', checked:true },
+  { cell:'H48', label:'Zanjas y Huecos', checked:false },
+  { cell:'O48', label:'Equipos Rotando', checked:true },
+  { cell:'U48', label:'Cargas Pesadas', checked:true },
+  { cell:'C50', label:'Incendio / Explosión', checked:true },
+  { cell:'H50', label:'Machucones, Rasguños', checked:true },
+  { cell:'O50', label:'Tareas Simultáneas', checked:false },
+  { cell:'U50', label:'Pinchazos, Cortaduras', checked:true },
+  { cell:'C52', label:'Derrames', checked:false },
+  { cell:'H52', label:'Esquirlas, Partículas', checked:false },
+  { cell:'O52', label:'Riesgo Biológico', checked:false },
+  { cell:'U52', label:'Superficies Calientes', checked:false },
+];
+
+// ═══════════════════════════════════════════════════════
+// DATOS: Control de Riesgos
+// ═══════════════════════════════════════════════════════
+const CONTROLES = [
+  { cell:'C57', label:'Equipo de Protección Personal', checked:true },
+  { cell:'H57', label:'Bloqueo y Señalización', checked:true },
+  { cell:'O57', label:'Protección contra Caídas', checked:false },
+  { cell:'U57', label:'Control de Incendios', checked:false },
+  { cell:'C59', label:'Barreras Físicas', checked:true },
+  { cell:'H59', label:'Permiso Trabajo Seguro', checked:false },
+  { cell:'O59', label:'Monitoreo Explosividad', checked:false },
+  { cell:'U59', label:'Procedimiento de Evacuación', checked:false },
+  { cell:'C61', label:'Equipo de Seguridad', checked:true },
+  { cell:'H61', label:'Permiso Trabajo en Caliente', checked:false },
+  { cell:'O61', label:'By-pass, Desgasificación', checked:false },
+  { cell:'U61', label:'Duchas y Estaciones Lavaojos', checked:false },
+  { cell:'C63', label:'Control Fuentes de Ignición', checked:false },
+  { cell:'H63', label:'Permiso Espacios Confinados', checked:false },
+  { cell:'O63', label:'Plan Control de Derrames', checked:false },
+  { cell:'U63', label:'MSDS', checked:false },
+  { cell:'C65', label:'Cortina de Agua', checked:false },
+  { cell:'H65', label:'Supervisión de HES', checked:false },
+  { cell:'O65', label:'MEDEVAC', checked:false },
+];
+
+// ═══════════════════════════════════════════════════════
+// DATOS: Equipo de Seguridad Requerido
+// ═══════════════════════════════════════════════════════
+const EQUIPO_SEG = [
+  { cell:'C68', label:'Casco', checked:true },
+  { cell:'H68', label:'Guantes de Nitrilo / Neopreno', checked:true },
+  { cell:'O68', label:'Cinta de Precaución', checked:true },
+  { cell:'U68', label:'Detector de LEL / Oxígeno', checked:false },
+  { cell:'C70', label:'Botas (Puntera)', checked:true },
+  { cell:'H70', label:'Delantal para Químicos', checked:false },
+  { cell:'O70', label:'Respirador Vapores Orgánicos', checked:false },
+  { cell:'U70', label:'Protección Auditiva', checked:true },
+  { cell:'C72', label:'Gafas de Seguridad', checked:true },
+  { cell:'H72', label:'Chaleco Salvavidas', checked:false },
+  { cell:'O72', label:'Respirador Humos de Soldadura', checked:false },
+  { cell:'U72', label:'Doble Protección Auditiva', checked:false },
+  { cell:'C74', label:'Protector Facial', checked:true },
+  { cell:'H74', label:'Arnés de Cuerpo Entero', checked:false },
+  { cell:'O74', label:'Respirador Polvos / Neblinas', checked:false },
+  { cell:'U74', label:'Traje Impermeable', checked:false },
+  { cell:'C76', label:'Guantes de Tela', checked:false },
+  { cell:'H76', label:'Doble Línea Vida / Amortiguador', checked:false },
+  { cell:'O76', label:'Resp. Canister Fungicidas', checked:false },
+  { cell:'U76', label:'Oberol de Tyvek®', checked:false },
+  { cell:'C78', label:'Gafas Manejo de Químicos', checked:false },
+  { cell:'H78', label:'Línea Vida Estática / Fija', checked:false },
+  { cell:'O78', label:'Extintor', checked:false },
+  { cell:'U78', label:'Careta para Soldar', checked:false },
+  { cell:'C80', label:'Guantes de Cuero', checked:true },
+  { cell:'H80', label:'Cables / Guaya de Seguridad', checked:false },
+  { cell:'O80', label:'Oberol Retardante al Fuego', checked:false },
+  { cell:'U80', label:'Peto, Polainas y Mangas Soldar', checked:false },
+  { cell:'C82', label:'Herramientas Adecuadas', checked:true },
+  { cell:'H82', label:'Otros (wet suit)', checked:false },
+  { cell:'O82', label:'Tanques de Buceo', checked:false },
+];
+
+// ═══════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  buildPrepItems();
+  buildCheckboxGrid('riesgos-grid', RIESGOS);
+  buildCheckboxGrid('controles-grid', CONTROLES);
+  buildCheckboxGrid('equipo-grid', EQUIPO_SEG);
+  buildWorkersTable();
 });
 
-// 🔹 GENERAR
-function generar(){
-
-const data={
-fi:fi.value,
-ff:ff.value,
-lugar:lugar.value,
-tipo:tipo.value,
-pasos:pasos.value,
-maq:maq.value,
-pel:pel.value,
-con:con.value,
-obs:obs.value
-};
-
-fetch(URL,{
-method:"POST",
-body:JSON.stringify(data)
-})
-.then(r=>r.json())
-.then(r=>{
-alert("LISTO MIGUELITO");
-
-// abrir archivo real
-window.open(r.url);
-
-// descargar
-window.open(r.download);
-
-// actualizar visor al nuevo ATS
-document.getElementById("visor").src =
-"https://docs.google.com/spreadsheets/d/"+r.url.split("/d/")[1].split("/")[0]+"/preview";
-
-});
-
+function buildPrepItems() {
+  const container = document.getElementById('prep-items');
+  PREP_ITEMS.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'radio-row';
+    div.innerHTML = `
+      <span class="radio-question">${item.label}</span>
+      <div class="radio-options">
+        <label class="radio-opt si-opt">
+          <input type="radio" name="${item.id}" value="SI" ${item.default==='SI'?'checked':''}>
+          <span class="radio-pill">SI</span>
+        </label>
+        <label class="radio-opt no-opt">
+          <input type="radio" name="${item.id}" value="NO" ${item.default==='NO'?'checked':''}>
+          <span class="radio-pill">NO</span>
+        </label>
+        <label class="radio-opt na-opt">
+          <input type="radio" name="${item.id}" value="NA" ${item.default==='NA'?'checked':''}>
+          <span class="radio-pill">N.A.</span>
+        </label>
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
-</script>
+function buildCheckboxGrid(containerId, items) {
+  const container = document.getElementById(containerId);
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cb-item' + (item.checked ? ' checked' : '');
+    div.setAttribute('data-cell', item.cell);
+    div.onclick = function(){ toggleCb(this); };
+    div.innerHTML = `<input type="checkbox" ${item.checked?'checked':''}><div class="cb-box">✓</div><span class="cb-label">${item.label}</span>`;
+    container.appendChild(div);
+  });
+}
 
+function buildWorkersTable() {
+  const tbody = document.getElementById('workers-body');
+  const workers = [
+    { nombre:'Julio Cesar Giraldo', ced:'98512289' },
+    { nombre:'Luis Eusebio Rios', ced:'98512112' },
+    { nombre:'Jorge Alexander Rios', ced:'98512658' },
+    { nombre:'Hector Jesus Rios', ced:'98512111' },
+    { nombre:'Juan Sebastian Mejia', ced:'1037236918' },
+    { nombre:'Deibis Segundo Cabellan', ced:'1083061576' },
+    { nombre:'', ced:'' },
+    { nombre:'', ced:'' },
+    { nombre:'', ced:'' },
+    { nombre:'', ced:'' },
+    { nombre:'', ced:'' },
+  ];
+  workers.forEach((w, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><input type="text" id="w_nombre_${i+1}" value="${w.nombre}" placeholder="Nombre completo"></td>
+      <td><input type="text" id="w_ced_${i+1}" value="${w.ced}" placeholder="Cédula"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TOGGLE SECTION
+// ═══════════════════════════════════════════════════════
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════
+// TOGGLE CHECKBOX
+// ═══════════════════════════════════════════════════════
+function toggleCb(el) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  if (cb) cb.checked = el.classList.contains('checked');
+}
+
+// ═══════════════════════════════════════════════════════
+// COLLECT FORM DATA
+// ═══════════════════════════════════════════════════════
+function collectData() {
+  // ── Campos básicos
+  const fi = document.getElementById('fi').value;
+  const ff = document.getElementById('ff').value;
+  const lugar = document.getElementById('lugar').value;
+  const tipo = 'TIPO DE TRABAJO: ' + document.getElementById('tipo').value;
+  const pasos = document.getElementById('pasos').value;
+  const maq = document.getElementById('maq').value;
+  const pel = document.getElementById('pel').value;
+  const con = document.getElementById('con').value;
+  const obs = 'OBSERVACIONES: ' + document.getElementById('obs').value;
+
+  // ── EPP (cells A12-Q18) - formato "X  LABEL" o "    LABEL"
+  function eppVal(cell) {
+    const el = document.querySelector(`[data-cell="${cell}"]`);
+    if (!el) return null;
+    const label = el.querySelector('.cb-label').textContent.trim().toUpperCase();
+    const checked = el.classList.contains('checked');
+    return checked ? `X  ${label}` : `    ${label}`;
+  }
+
+  // ── Herramientas
+  const h_manuales = document.getElementById('h_manuales').value;
+  const h_electricas = document.getElementById('h_electricas').value;
+  const h_neumaticas = document.getElementById('h_neumaticas').value;
+  const h_hidraulicas = document.getElementById('h_hidraulicas').value;
+  const h_mecanicas = document.getElementById('h_mecanicas').value;
+  const h_otras = document.getElementById('h_otras').value;
+
+  // ── Preparación del área (SI/NO/N.A. → X en columna correcta)
+  const prep = {};
+  PREP_ITEMS.forEach(item => {
+    const val = document.querySelector(`input[name="${item.id}"]:checked`)?.value || 'SI';
+    prep[item.col_s] = val === 'SI' ? 'X' : '';
+    prep[item.col_u] = val === 'NO' ? 'X' : '';
+    prep[item.col_v] = val === 'NA' ? 'X' : '';
+  });
+
+  // ── Checkboxes generales (riesgos, controles, equipo)
+  function cbVal(cell) {
+    const el = document.querySelector(`[data-cell="${cell}"]`);
+    if (!el) return null;
+    const label = el.querySelector('.cb-label').textContent.trim();
+    const checked = el.classList.contains('checked');
+    return checked ? `X  ${label}` : `    ${label}`;
+  }
+
+  // ── Trabajadores
+  const workers = [];
+  for (let i = 1; i <= 11; i++) {
+    workers.push({
+      nombre: document.getElementById(`w_nombre_${i}`)?.value || '',
+      cedula: document.getElementById(`w_ced_${i}`)?.value || '',
+    });
+  }
+
+  // ── Responsables
+  const resp_sst = 'RESPONSABLE SST: ' + document.getElementById('resp_sst').value;
+  const firma_ing = 'FIRMA INGENIERO: ' + document.getElementById('firma_ing').value;
+  const firma_enc = 'FIRMA ENCARGADO: ' + document.getElementById('firma_enc').value;
+  const lineas = 'VERIFICAR Y/O CONSULTAR LAS LÍNEAS DE EMERGENCIA:\n' + document.getElementById('lineas_emergencia').value;
+
+  // ── Build full payload
+  return {
+    // Fechas y lugar
+    fi, ff, lugar,
+    // Texto principal
+    tipo, pasos, maq, pel, con, obs,
+    // EPP
+    A12: eppVal('A12'), A13: eppVal('A13'), A14: eppVal('A14'),
+    A15: eppVal('A15'), A16: eppVal('A16'), A17: eppVal('A17'), A18: eppVal('A18'),
+    J12: eppVal('J12'), J13: eppVal('J13'), J14: eppVal('J14'),
+    J15: eppVal('J15'), J16: eppVal('J16'), J17: eppVal('J17'), J18: eppVal('J18'),
+    Q12: eppVal('Q12'), Q13: eppVal('Q13'), Q14: eppVal('Q14'),
+    Q15: eppVal('Q15'), Q16: eppVal('Q16'), Q17: eppVal('Q17'), Q18: eppVal('Q18'),
+    // Herramientas
+    F21: h_manuales, F22: h_electricas, F23: h_neumaticas,
+    F24: h_hidraulicas, A25_val: h_mecanicas, A26_val: h_otras,
+    // Preparación del área
+    ...prep,
+    // Líneas de emergencia
+    A39: lineas,
+    // Riesgos
+    C42: cbVal('C42'), H42: cbVal('H42'), O42: cbVal('O42'), U42: cbVal('U42'),
+    C44: cbVal('C44'), H44: cbVal('H44'), O44: cbVal('O44'), U44: cbVal('U44'),
+    C46: cbVal('C46'), H46: cbVal('H46'), O46: cbVal('O46'), U46: cbVal('U46'),
+    C48: cbVal('C48'), H48: cbVal('H48'), O48: cbVal('O48'), U48: cbVal('U48'),
+    C50: cbVal('C50'), H50: cbVal('H50'), O50: cbVal('O50'), U50: cbVal('U50'),
+    C52: cbVal('C52'), H52: cbVal('H52'), O52: cbVal('O52'), U52: cbVal('U52'),
+    C54: '    Describa Otros: ' + document.getElementById('otros_riesgos').value,
+    // Control de riesgos
+    C57: cbVal('C57'), H57: cbVal('H57'), O57: cbVal('O57'), U57: cbVal('U57'),
+    C59: cbVal('C59'), H59: cbVal('H59'), O59: cbVal('O59'), U59: cbVal('U59'),
+    C61: cbVal('C61'), H61: cbVal('H61'), O61: cbVal('O61'), U61: cbVal('U61'),
+    C63: cbVal('C63'), H63: cbVal('H63'), O63: cbVal('O63'), U63: cbVal('U63'),
+    C65: cbVal('C65'), H65: cbVal('H65'), O65: cbVal('O65'),
+    // Equipo seguridad
+    C68: cbVal('C68'), H68: cbVal('H68'), O68: cbVal('O68'), U68: cbVal('U68'),
+    C70: cbVal('C70'), H70: cbVal('H70'), O70: cbVal('O70'), U70: cbVal('U70'),
+    C72: cbVal('C72'), H72: cbVal('H72'), O72: cbVal('O72'), U72: cbVal('U72'),
+    C74: cbVal('C74'), H74: cbVal('H74'), O74: cbVal('O74'), U74: cbVal('U74'),
+    C76: cbVal('C76'), H76: cbVal('H76'), O76: cbVal('O76'), U76: cbVal('U76'),
+    C78: cbVal('C78'), H78: cbVal('H78'), O78: cbVal('O78'), U78: cbVal('U78'),
+    C80: cbVal('C80'), H80: cbVal('H80'), O80: cbVal('O80'), U80: cbVal('U80'),
+    C82: cbVal('C82'), H82: cbVal('H82'), O82: cbVal('O82'),
+    // Trabajadores
+    workers,
+    // Responsables
+    A96: resp_sst, L96: firma_ing, R96: firma_enc,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// GENERAR ATS
+// ═══════════════════════════════════════════════════════
+async function generarATS() {
+  const data = collectData();
+
+  // Validación básica
+  if (!data.fi || !data.lugar.trim()) {
+    showToast('⚠️ Complete la fecha de inicio y el lugar', 'error');
+    return;
+  }
+
+  setLoading(true);
+  document.getElementById('overlay-loading').classList.add('active');
+  setStatus('Enviando datos a Google Apps Script...');
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'text/plain' }
+    });
+
+    const result = await res.json();
+
+    document.getElementById('overlay-loading').classList.remove('active');
+
+    if (result.url) {
+      // Extraer el fileId para construir URL de descarga
+      const fileId = result.url.split('/d/')[1]?.split('/')[0] || '';
+      const downloadUrl = fileId
+        ? `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`
+        : result.download;
+
+      document.getElementById('btn-open-drive').href = result.url;
+      document.getElementById('btn-download').href = downloadUrl;
+
+      const fecha = data.fi || new Date().toISOString().slice(0,10);
+      document.getElementById('success-msg').textContent =
+        `Archivo ATS_${fecha} creado en Google Drive. Puede abrirlo o descargarlo directamente.`;
+
+      document.getElementById('overlay-success').classList.add('active');
+      setStatus('✅ ATS generado correctamente — ' + new Date().toLocaleTimeString('es-CO'));
+      showToast('✅ ATS generado y guardado en Drive', 'success');
+    } else {
+      throw new Error(result.error || 'Respuesta inesperada del servidor');
+    }
+  } catch (err) {
+    document.getElementById('overlay-loading').classList.remove('active');
+    document.getElementById('error-msg').textContent = `Error: ${err.message}. Verifique que el GAS esté desplegado y accesible.`;
+    document.getElementById('overlay-error').classList.add('active');
+    setStatus('❌ Error al generar — revise la consola');
+    showToast('❌ Error de conexión con GAS', 'error');
+    console.error('GAS Error:', err);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function setLoading(on) {
+  ['btnGenerar','btnGenerar2'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = on;
+  });
+}
+
+function setStatus(msg) {
+  document.getElementById('status-text').textContent = msg;
+}
+
+function closeOverlay(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function resetForm() {
+  if (!confirm('¿Restablecer todos los campos a los valores por defecto del ATS Abril 2026?')) return;
+  location.reload();
+}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => { t.className = 'toast'; }, 4000);
+}
+
+// Cerrar overlays con Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['overlay-success','overlay-error'].forEach(closeOverlay);
+  }
+});
+</script>
 </body>
 </html>
