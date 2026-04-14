@@ -462,12 +462,148 @@
   .toast.error { border-left: 4px solid var(--red); }
   .toast.info { border-left: 4px solid var(--blue); }
 
+  /* ── FIRMA MODAL ── */
+  .firma-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .firma-modal-overlay.active { display: flex; }
+  .firma-modal-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px 32px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+  }
+  .firma-modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border-light);
+    border-radius: 4px;
+    margin: 0 auto 16px;
+  }
+  .firma-modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .firma-modal-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .firma-canvas-wrap {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    touch-action: none;
+    position: relative;
+    margin-bottom: 14px;
+  }
+  #firma-canvas {
+    display: block;
+    width: 100%;
+    height: 220px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .firma-canvas-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 13px;
+    pointer-events: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .firma-canvas-placeholder.hidden { display: none; }
+  .firma-canvas-line {
+    position: absolute;
+    bottom: 52px; left: 20px; right: 20px;
+    height: 1px;
+    background: #e5e7eb;
+    pointer-events: none;
+  }
+  .firma-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* ── FIRMA EN TABLA ── */
+  .firma-worker-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .firma-worker-preview {
+    width: 80px;
+    height: 36px;
+    background: var(--bg);
+    border: 1px dashed var(--border-light);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .firma-worker-preview img { width: 100%; height: 100%; object-fit: contain; }
+  .firma-worker-preview .no-firma {
+    font-size: 9px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+  }
+  .firma-worker-btn {
+    font-size: 10px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    padding: 2px 6px;
+  }
+
+  /* ── FIRMA RESPONSABLES ── */
+  .firma-resp-wrap {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .firma-resp-canvas {
+    flex: 1;
+    height: 52px;
+    background: var(--bg);
+    border: 1px dashed var(--border-light);
+    border-radius: 6px;
+    display: block;
+  }
+  .firma-resp-btns { display: flex; gap: 4px; flex-shrink: 0; }
+
   @media (max-width: 768px) {
     .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     .app-header { padding: 12px 16px; }
     .app-body { padding: 16px 12px 80px; }
     .header-actions .btn { padding: 8px 12px; font-size: 12px; }
     .status-bar { padding: 10px 16px; }
+    #firma-canvas { height: 260px; }
   }
 </style>
 </head>
@@ -688,6 +824,7 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
             <th>N°</th>
             <th>Nombre Completo</th>
             <th>Cédula</th>
+            <th style="text-align:center;width:90px">Firma</th>
           </tr>
         </thead>
         <tbody id="workers-body"></tbody>
@@ -707,14 +844,35 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
         <div class="field-group">
           <label>Responsable SST</label>
           <input type="text" id="resp_sst" value="Yenny Moreno">
+          <div class="firma-resp-wrap">
+            <canvas id="firma_resp_sst" class="firma-resp-canvas" data-label="Responsable SST"></canvas>
+            <div class="firma-resp-btns">
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="openFirmaResp('firma_resp_sst','Responsable SST')">✍ Firmar</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--danger)" onclick="clearFirmaResp('firma_resp_sst')">✕</button>
+            </div>
+          </div>
         </div>
         <div class="field-group">
           <label>Firma Ingeniero</label>
           <input type="text" id="firma_ing" value="Juan Diego Martinez">
+          <div class="firma-resp-wrap">
+            <canvas id="firma_resp_ing" class="firma-resp-canvas" data-label="Ingeniero"></canvas>
+            <div class="firma-resp-btns">
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="openFirmaResp('firma_resp_ing','Firma Ingeniero')">✍ Firmar</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--danger)" onclick="clearFirmaResp('firma_resp_ing')">✕</button>
+            </div>
+          </div>
         </div>
         <div class="field-group">
           <label>Firma Encargado</label>
           <input type="text" id="firma_enc" value="Edwin Marin">
+          <div class="firma-resp-wrap">
+            <canvas id="firma_resp_enc" class="firma-resp-canvas" data-label="Encargado"></canvas>
+            <div class="firma-resp-btns">
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="openFirmaResp('firma_resp_enc','Firma Encargado')">✍ Firmar</button>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--danger)" onclick="clearFirmaResp('firma_resp_enc')">✕</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="field-group">
@@ -733,10 +891,13 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
 <!-- STATUS BAR -->
 <div class="status-bar">
   <div class="status-info">
-    <div class="status-dot"></div>
-    <span id="status-text">Formulario listo — Revise y edite los datos antes de generar</span>
+    <div class="status-dot" id="conn-dot"></div>
+    <span id="conn-label">Verificando GAS...</span>
+    <span style="color:var(--text-dim)">|</span>
+    <span id="status-text">Formulario listo</span>
   </div>
   <div class="header-actions">
+    <button class="btn btn-ghost" onclick="openGasConfig()" title="Configurar URL del GAS">⚙ URL GAS</button>
     <button class="btn btn-secondary" onclick="generarATS()" id="btnGenerar2">
       <span class="btn-icon">⚡</span> Generar y Guardar en Drive
     </button>
@@ -779,6 +940,43 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
   </div>
 </div>
 
+<!-- ══ MODAL DE FIRMA ══ -->
+<div class="firma-modal-overlay" id="firma-modal-overlay">
+  <div class="firma-modal-panel">
+    <div class="firma-modal-handle"></div>
+    <div class="firma-modal-title" id="firma-modal-title">Firma</div>
+    <div class="firma-modal-hint">Firme con su dedo o lápiz en el área blanca</div>
+    <div class="firma-canvas-wrap">
+      <canvas id="firma-canvas"></canvas>
+      <div class="firma-canvas-line"></div>
+      <div class="firma-canvas-placeholder" id="firma-placeholder">✍ Toque aquí para firmar</div>
+    </div>
+    <div class="firma-modal-actions">
+      <button class="btn btn-ghost" onclick="clearFirmaModal()">🗑 Borrar</button>
+      <button class="btn btn-secondary" onclick="closeFirmaModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFirmaModal()">✓ Guardar Firma</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY CONFIG GAS URL -->
+<div class="overlay" id="overlay-gas-config">
+  <div class="modal" style="max-width:560px;text-align:left">
+    <div class="modal-icon" style="text-align:center">⚙️</div>
+    <h2 style="text-align:center;margin-bottom:8px">URL de Google Apps Script</h2>
+    <p style="text-align:center">Pega aquí la URL que te da Google al desplegar el GAS.<br>Se guarda automáticamente en este navegador.</p>
+    <div style="display:grid;gap:8px;margin-bottom:20px">
+      <label style="font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace">URL del Web App</label>
+      <input id="gas-url-input" type="text" placeholder="https://script.google.com/macros/s/..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:10px 14px;width:100%">
+      <p style="font-size:11px;color:var(--text-dim);margin:0">📌 En Apps Script: <strong style="color:var(--text-muted)">Implementar → Administrar implementaciones → URL del Web App</strong></p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveGasUrl()">💾 Guardar y probar</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('overlay-gas-config').classList.remove('active')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -786,7 +984,45 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
 // ═══════════════════════════════════════════════════════
 // CONFIGURACIÓN — Solo cambia esta URL si redesplegás el GAS
 // ═══════════════════════════════════════════════════════
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+// ══════════════════════════════════════════════════════════
+// CONFIGURA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+// Cada vez que redespliegues el GAS, pega la nueva URL aquí
+// ══════════════════════════════════════════════════════════
+let GAS_URL = localStorage.getItem('gas_url') || "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+
+function openGasConfig() {
+  document.getElementById('gas-url-input').value = GAS_URL;
+  document.getElementById('overlay-gas-config').classList.add('active');
+}
+function saveGasUrl() {
+  const newUrl = document.getElementById('gas-url-input').value.trim();
+  if (!newUrl.includes('script.google.com')) {
+    alert('La URL no parece válida. Debe contener script.google.com');
+    return;
+  }
+  GAS_URL = newUrl;
+  localStorage.setItem('gas_url', GAS_URL);
+  document.getElementById('overlay-gas-config').classList.remove('active');
+  testGasConnection();
+}
+async function testGasConnection() {
+  const dot = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  dot.style.background = '#f59e0b';
+  label.textContent = 'Verificando GAS...';
+  try {
+    const res = await fetch(GAS_URL, { method: 'GET', mode: 'cors' });
+    if (res.ok) {
+      dot.style.background = '#10b981';
+      label.textContent = 'GAS conectado ✓';
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch(e) {
+    dot.style.background = '#ef4444';
+    label.textContent = 'GAS sin conexión — haz clic en ⚙ URL';
+  }
+}
 
 // ═══════════════════════════════════════════════════════
 // DATOS: Preparación del Área
@@ -906,6 +1142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   buildCheckboxGrid('controles-grid', CONTROLES);
   buildCheckboxGrid('equipo-grid', EQUIPO_SEG);
   buildWorkersTable();
+  // Verificar conexión al cargar
+  setTimeout(testGasConnection, 800);
 });
 
 function buildPrepItems() {
@@ -967,9 +1205,141 @@ function buildWorkersTable() {
       <td>${i+1}</td>
       <td><input type="text" id="w_nombre_${i+1}" value="${w.nombre}" placeholder="Nombre completo"></td>
       <td><input type="text" id="w_ced_${i+1}" value="${w.ced}" placeholder="Cédula"></td>
+      <td>
+        <div class="firma-worker-cell">
+          <div class="firma-worker-preview" id="firma-preview-w${i+1}" onclick="openFirmaWorker(${i+1})">
+            <span class="no-firma">Sin<br>firma</span>
+          </div>
+          <button class="firma-worker-btn" onclick="openFirmaWorker(${i+1})">✍ Firmar</button>
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE FIRMAS
+// ═══════════════════════════════════════════════════════
+const firmaStore = {}; // { 'w1': dataURL, 'w2': dataURL, ..., 'sst': dataURL, 'ing': dataURL, 'enc': dataURL }
+
+let firmaCtx = null;
+let firmaDrawing = false;
+let firmaLastX = 0, firmaLastY = 0;
+let firmaTarget = null;  // id destino actual
+let firmaHasDraw = false;
+
+function initFirmaCanvas() {
+  const canvas = document.getElementById('firma-canvas');
+  const wrap = canvas.parentElement;
+  // Tamaño real
+  canvas.width = wrap.clientWidth || 560;
+  canvas.height = canvas.offsetHeight || 220;
+  firmaCtx = canvas.getContext('2d');
+  firmaCtx.strokeStyle = '#1a1a2e';
+  firmaCtx.lineWidth = 2.5;
+  firmaCtx.lineCap = 'round';
+  firmaCtx.lineJoin = 'round';
+  firmaCtx.fillStyle = '#ffffff';
+  firmaCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Mouse
+  canvas.addEventListener('mousedown', e => { firmaDrawing = true; firmaHasDraw = true; hidePlaceholder(); const p = getPos(e,canvas); firmaLastX=p.x; firmaLastY=p.y; });
+  canvas.addEventListener('mousemove', e => { if (!firmaDrawing) return; const p = getPos(e,canvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; });
+  canvas.addEventListener('mouseup', () => firmaDrawing = false);
+  canvas.addEventListener('mouseleave', () => firmaDrawing = false);
+
+  // Touch
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); firmaDrawing=true; firmaHasDraw=true; hidePlaceholder(); const p=getPos(e.touches[0],canvas); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if(!firmaDrawing) return; const p=getPos(e.touches[0],canvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
+  canvas.addEventListener('touchend', e => { e.preventDefault(); firmaDrawing=false; }, {passive:false});
+}
+
+function getPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+function drawLine(x1,y1,x2,y2) {
+  firmaCtx.beginPath();
+  firmaCtx.moveTo(x1,y1);
+  firmaCtx.lineTo(x2,y2);
+  firmaCtx.stroke();
+}
+function hidePlaceholder() {
+  document.getElementById('firma-placeholder').classList.add('hidden');
+}
+
+function openFirmaWorker(idx) {
+  firmaTarget = 'w' + idx;
+  const nombre = document.getElementById('w_nombre_' + idx)?.value || ('Trabajador ' + idx);
+  openFirmaModal('Firma — ' + nombre);
+}
+function openFirmaResp(canvasId, label) {
+  firmaTarget = canvasId;
+  openFirmaModal('Firma — ' + label);
+}
+function openFirmaModal(title) {
+  document.getElementById('firma-modal-title').textContent = title;
+  document.getElementById('firma-placeholder').classList.remove('hidden');
+  document.getElementById('firma-modal-overlay').classList.add('active');
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    firmaHasDraw = false;
+    initFirmaCanvas();
+    // Si ya hay firma previa, pintarla
+    const prev = firmaStore[firmaTarget];
+    if (prev) {
+      const img = new Image();
+      img.onload = () => { firmaCtx.drawImage(img, 0, 0, firmaCtx.canvas.width, firmaCtx.canvas.height); hidePlaceholder(); firmaHasDraw = true; };
+      img.src = prev;
+    }
+  }, 80);
+}
+function clearFirmaModal() {
+  const canvas = document.getElementById('firma-canvas');
+  firmaCtx.fillStyle = '#ffffff';
+  firmaCtx.fillRect(0, 0, canvas.width, canvas.height);
+  firmaHasDraw = false;
+  document.getElementById('firma-placeholder').classList.remove('hidden');
+}
+function closeFirmaModal() {
+  document.getElementById('firma-modal-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+  firmaTarget = null;
+}
+function saveFirmaModal() {
+  if (!firmaHasDraw) { showToast('⚠️ No hay firma — dibuje antes de guardar', 'error'); return; }
+  const canvas = document.getElementById('firma-canvas');
+  const dataURL = canvas.toDataURL('image/png');
+  firmaStore[firmaTarget] = dataURL;
+
+  // Actualizar preview
+  if (firmaTarget.startsWith('w')) {
+    const idx = firmaTarget.replace('w','');
+    const preview = document.getElementById('firma-preview-w' + idx);
+    preview.innerHTML = `<img src="${dataURL}" alt="firma">`;
+  } else {
+    // Responsable canvas
+    const respCanvas = document.getElementById(firmaTarget);
+    if (respCanvas) {
+      const ctx = respCanvas.getContext('2d');
+      respCanvas.width = respCanvas.offsetWidth || 200;
+      respCanvas.height = respCanvas.offsetHeight || 52;
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, respCanvas.width, respCanvas.height);
+      img.src = dataURL;
+    }
+  }
+  closeFirmaModal();
+  showToast('✅ Firma guardada', 'success');
+}
+function clearFirmaResp(canvasId) {
+  delete firmaStore[canvasId];
+  const c = document.getElementById(canvasId);
+  if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1044,6 +1414,7 @@ function collectData() {
     workers.push({
       nombre: document.getElementById(`w_nombre_${i}`)?.value || '',
       cedula: document.getElementById(`w_ced_${i}`)?.value || '',
+      firma:  firmaStore['w'+i] || null,
     });
   }
 
@@ -1052,6 +1423,11 @@ function collectData() {
   const firma_ing = 'FIRMA INGENIERO: ' + document.getElementById('firma_ing').value;
   const firma_enc = 'FIRMA ENCARGADO: ' + document.getElementById('firma_enc').value;
   const lineas = 'VERIFICAR Y/O CONSULTAR LAS LÍNEAS DE EMERGENCIA:\n' + document.getElementById('lineas_emergencia').value;
+
+  // ── Firmas responsables (base64)
+  const firma_sst_img  = firmaStore['firma_resp_sst'] || null;
+  const firma_ing_img  = firmaStore['firma_resp_ing'] || null;
+  const firma_enc_img  = firmaStore['firma_resp_enc'] || null;
 
   // ── Build full payload
   return {
@@ -1100,6 +1476,8 @@ function collectData() {
     workers,
     // Responsables
     A96: resp_sst, L96: firma_ing, R96: firma_enc,
+    // Firmas imágenes base64
+    firma_sst_img, firma_ing_img, firma_enc_img,
   };
 }
 
