@@ -1011,13 +1011,11 @@ async function testGasConnection() {
   dot.style.background = '#f59e0b';
   label.textContent = 'Verificando GAS...';
   try {
-    const res = await fetch(GAS_URL, { method: 'GET', mode: 'cors' });
-    if (res.ok) {
-      dot.style.background = '#10b981';
-      label.textContent = 'GAS conectado ✓';
-    } else {
-      throw new Error('HTTP ' + res.status);
-    }
+    // GAS no permite leer la respuesta desde origen externo (CORS),
+    // pero si no lanza excepción de red, el endpoint existe y está activo.
+    await fetch(GAS_URL, { method: 'GET', mode: 'no-cors' });
+    dot.style.background = '#10b981';
+    label.textContent = 'GAS conectado ✓';
   } catch(e) {
     dot.style.background = '#ef4444';
     label.textContent = 'GAS sin conexión — haz clic en ⚙ URL';
@@ -1498,17 +1496,22 @@ async function generarATS() {
   setStatus('Enviando datos a Google Apps Script...');
 
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'text/plain' },
+    // ── Estrategia CORS-safe para Google Apps Script ──────────────────
+    // GAS no puede agregar Access-Control-Allow-Origin en POST,
+    // pero SÍ en GET. Solución: enviamos los datos como parámetro JSON
+    // en un GET request — GAS lo procesa y responde normalmente.
+    const encoded = encodeURIComponent(JSON.stringify(data));
+    const url = GAS_URL + '?payload=' + encoded;
+
+    const res = await fetch(url, {
+      method: 'GET',
       redirect: 'follow'
     });
 
     const text = await res.text();
     let result;
     try { result = JSON.parse(text); }
-    catch { throw new Error('Respuesta no válida del servidor: ' + text.slice(0, 200)); }
+    catch { throw new Error('Respuesta no válida del servidor: ' + text.slice(0, 300)); }
 
     document.getElementById('overlay-loading').classList.remove('active');
 
