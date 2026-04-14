@@ -1577,5 +1577,42 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
+
+<script>
+async function generarATS() {
+  const overlay = document.getElementById('overlay-loading');
+
+  try {
+    overlay.classList.add('active');
+
+    const data = collectData();
+
+    const url = GAS_URL + "?data=" + encodeURIComponent(JSON.stringify(data));
+
+    const response = await fetch(url);
+
+    const result = await response.json();
+
+    overlay.classList.remove('active');
+
+    if (!result.ok) {
+      throw new Error(result.error || "Error desconocido");
+    }
+
+    document.getElementById('overlay-success').classList.add('active');
+
+    if (result.url) {
+      document.getElementById('btn-open-drive').href = result.url;
+    }
+
+  } catch (error) {
+    overlay.classList.remove('active');
+    document.getElementById('overlay-error').classList.add('active');
+    document.getElementById('error-msg').textContent = error.message;
+    console.error(error);
+  }
+}
+</script>
+
 </body>
 </html>
