@@ -1500,8 +1500,8 @@ async function generarATS() {
 
     document.getElementById('overlay-loading').classList.remove('active');
 
-    if (result && result.url) {
-      const fileId = result.fileId || result.url.split('/d/')[1]?.split('/')[0] || '';
+    if (result && (result.url || result.ok)) {
+      const fileId = result.fileId || (result.url && result.url.split('/d/')[1]?.split('/')[0]) || '';
       const downloadUrl = fileId
         ? `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`
         : result.download;
@@ -1531,81 +1531,38 @@ async function generarATS() {
   }
 }
 
-// ─── callGAS: JSONP chunked — parte el payload en trozos de 4000 chars
-// El GAS acumula los chunks en CacheService y al final ensambla y procesa.
-// Esto evita el límite de URL y NO requiere CORS ni POST.
-function callGAS(data) {
-  const CHUNK_SIZE = 4000; // chars seguros por URL de GAS
-  const payload = JSON.stringify(data);
-  const encoded = encodeURIComponent(payload);
+// ─── callGAS: POST con CORS habilitado en el GAS (doPost devuelve headers CORS)
+// Esta función siempre usa POST directo — sin JSONP, sin no-cors.
+// Requiere que el GAS tenga doPost con ContentService y headers CORS correctos.
+async function callGAS(data) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
 
-  // Si cabe en una sola llamada, lo enviamos directo
-  const directUrl = GAS_URL + '?callback=__direct__&payload=' + encoded;
-  if (directUrl.length <= 7500) {
-    return jsonpCall({ payload: encoded });
-  }
+  try {
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
 
-  // Partir en chunks
-  const sessionId = 'ats_' + Date.now();
-  const chunks = [];
-  for (let i = 0; i < encoded.length; i += CHUNK_SIZE) {
-    chunks.push(encoded.slice(i, i + CHUNK_SIZE));
-  }
+    clearTimeout(timeout);
 
-  // Enviar chunks secuencialmente, luego pedir el finish
-  return chunks.reduce((promise, chunk, i) => {
-    return promise.then(() => jsonpCall({
-      chunk: i,
-      total: chunks.length,
-      id: sessionId,
-      payload: chunk
-    }));
-  }, Promise.resolve())
-  .then(() => jsonpCall({
-    finish: sessionId,
-    total_chunks: chunks.length
-  }));
-}
-
-// ─── jsonpCall: hace una llamada JSONP y retorna Promise con el resultado
-function jsonpCall(params) {
-  return new Promise((resolve, reject) => {
-    const cbName = 'gasChunk_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error('Tiempo de espera agotado. Verifique que el GAS esté desplegado como "Cualquier persona".'));
-    }, 60000);
-
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[cbName];
-      const el = document.getElementById('jsonp-tmp');
-      if (el) el.remove();
+    if (!response.ok) {
+      throw new Error('El servidor respondió con código ' + response.status);
     }
 
-    window[cbName] = function(result) {
-      cleanup();
-      if (result && result.ok === false && !result.stored) {
-        reject(new Error(result.error || 'Error en GAS'));
-      } else {
-        resolve(result);
-      }
-    };
+    const result = await response.json();
+    return result;
 
-    const qs = Object.entries(params)
-      .map(([k, v]) => k + '=' + encodeURIComponent(v))
-      .join('&');
-    const url = GAS_URL + '?callback=' + cbName + '&' + qs;
-
-    const script = document.createElement('script');
-    script.id = 'jsonp-tmp';
-    script.src = url;
-    script.onerror = () => {
-      cleanup();
-      reject(new Error('No se pudo conectar al GAS. Verifique la URL y el despliegue.'));
-    };
-    document.head.appendChild(script);
-  });
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      throw new Error('Tiempo de espera agotado (60s). Verifique que el GAS esté desplegado con acceso "Cualquier persona".');
+    }
+    throw err;
+  }
 }
 
 // ═══════════════════════════════════════════════════════
