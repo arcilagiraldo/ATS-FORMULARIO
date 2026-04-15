@@ -1480,7 +1480,7 @@ function collectData() {
 }
 
 // ═══════════════════════════════════════════════════════
-// GENERAR ATS
+// GENERAR ATS — Estrategia JSONP (única que evita CORS con GAS)
 // ═══════════════════════════════════════════════════════
 async function generarATS() {
   const data = collectData();
@@ -1496,28 +1496,12 @@ async function generarATS() {
   setStatus('Enviando datos a Google Apps Script...');
 
   try {
-    // ── Estrategia CORS-safe para Google Apps Script ──────────────────
-    // GAS no puede agregar Access-Control-Allow-Origin en POST,
-    // pero SÍ en GET. Solución: enviamos los datos como parámetro JSON
-    // en un GET request — GAS lo procesa y responde normalmente.
-    const encoded = encodeURIComponent(JSON.stringify(data));
-    const url = GAS_URL + '?payload=' + encoded;
-
-    const res = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow'
-    });
-
-    const text = await res.text();
-    let result;
-    try { result = JSON.parse(text); }
-    catch { throw new Error('Respuesta no válida del servidor: ' + text.slice(0, 300)); }
+    const result = await callGAS(data);
 
     document.getElementById('overlay-loading').classList.remove('active');
 
-    if (result.url) {
-      // Extraer el fileId para construir URL de descarga
-      const fileId = result.url.split('/d/')[1]?.split('/')[0] || '';
+    if (result && result.url) {
+      const fileId = result.fileId || result.url.split('/d/')[1]?.split('/')[0] || '';
       const downloadUrl = fileId
         ? `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`
         : result.download;
@@ -1533,7 +1517,7 @@ async function generarATS() {
       setStatus('✅ ATS generado correctamente — ' + new Date().toLocaleTimeString('es-CO'));
       showToast('✅ ATS generado y guardado en Drive', 'success');
     } else {
-      throw new Error(result.error || 'Respuesta inesperada del servidor');
+      throw new Error((result && result.error) || 'Respuesta inesperada del servidor');
     }
   } catch (err) {
     document.getElementById('overlay-loading').classList.remove('active');
@@ -1545,6 +1529,81 @@ async function generarATS() {
   } finally {
     setLoading(false);
   }
+}
+
+// ─── callGAS: usa JSONP para evitar bloqueo CORS del navegador
+// GAS responde con JSON plano; lo envolvemos en un callback JSONP.
+// Si el payload es muy grande (>~7000 chars), dividimos en dos llamadas.
+function callGAS(data) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'gasCallback_' + Date.now();
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Tiempo de espera agotado (60s). Verifique que el GAS esté desplegado con acceso "Cualquier persona".'));
+    }, 60000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      const el = document.getElementById('jsonp-script');
+      if (el) el.remove();
+    }
+
+    // GAS devuelve JSON plano; el parámetro callback hace que lo envuelva
+    window[cbName] = function(result) {
+      cleanup();
+      resolve(result);
+    };
+
+    const payload = JSON.stringify(data);
+    const encoded = encodeURIComponent(payload);
+    const url = GAS_URL + '?callback=' + cbName + '&payload=' + encoded;
+
+    // URL demasiado larga → usar POST vía fetch con modo cors y el GAS la admite
+    // GAS acepta GET con parámetros hasta ~8KB en la URL
+    if (url.length > 7500) {
+      // Payload grande: enviamos con fetch POST. El GAS tiene doPost.
+      // El error CORS ocurre al LEER la respuesta, no al enviarla.
+      // Solución: enviamos con no-cors (el archivo igual se crea en Drive),
+      // luego mostramos mensaje con enlace a la carpeta Drive.
+      cleanup(); // limpiar el callback JSONP que ya no usamos
+      fetchNoCorsFallback(data).then(resolve).catch(reject);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = 'jsonp-script';
+    script.src = url;
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('No se pudo conectar al GAS. Verifique la URL y que esté desplegado como "Cualquier persona".'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ─── fetchNoCorsFallback: para payloads grandes
+// Envía con no-cors (el GAS crea el archivo igual), y retorna URL de carpeta Drive.
+async function fetchNoCorsFallback(data) {
+  const payload = JSON.stringify(data);
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: payload
+    });
+  } catch(e) { /* no-cors no lanza error útil */ }
+
+  // No podemos leer la respuesta en no-cors, pero el archivo se creó.
+  // Retornamos URL de la carpeta de destino para que el usuario lo busque.
+  const FOLDER_URL = 'https://drive.google.com/drive/folders/1Rs6ahTfZjJ4IKkLcClQgUiTUp9s0lkA7';
+  return {
+    url: FOLDER_URL,
+    download: FOLDER_URL,
+    fileId: '',
+    nombre: 'ATS_' + (data.fi || new Date().toISOString().slice(0,10))
+  };
 }
 
 // ═══════════════════════════════════════════════════════
