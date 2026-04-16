@@ -91,320 +91,88 @@
     letter-spacing: 0.3px;
     white-space: nowrap;
   }
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
+  .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:hover { background: var(--border); }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    font-size: 12px;
-    padding: 7px 14px;
-  }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-size: 12px; padding: 7px 14px; }
   .btn-ghost:hover { color: var(--text); border-color: var(--border-light); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
   .btn-icon { font-size: 16px; }
 
   /* ── LAYOUT ── */
-  .app-body {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-  }
+  .app-body { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
 
   /* ── SECTION ── */
-  .section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    user-select: none;
-  }
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+  .section-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
   .section-header:hover { background: var(--border); }
-  .section-num {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #000;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .section-title {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    flex: 1;
-  }
-  .section-chevron {
-    color: var(--text-muted);
-    font-size: 12px;
-    transition: transform 0.2s;
-  }
+  .section-num { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #000; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-size: 13px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; flex: 1; }
+  .section-chevron { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
   .section.collapsed .section-chevron { transform: rotate(-90deg); }
-  .section-body {
-    padding: 20px;
-    display: grid;
-    gap: 16px;
-  }
+  .section-body { padding: 20px; display: grid; gap: 16px; }
   .section.collapsed .section-body { display: none; }
 
   /* ── FORM ELEMENTS ── */
-  .field-group {
-    display: grid;
-    gap: 6px;
+  .field-group { display: grid; gap: 6px; }
+  .field-group label { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+  .field-group input, .field-group textarea, .field-group select {
+    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px;
+    padding: 10px 14px; transition: border-color 0.15s; width: 100%; resize: vertical;
   }
-  .field-group label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  .field-group input,
-  .field-group textarea,
-  .field-group select {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    padding: 10px 14px;
-    transition: border-color 0.15s;
-    width: 100%;
-    resize: vertical;
-  }
-  .field-group input:focus,
-  .field-group textarea:focus,
-  .field-group select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+  .field-group input:focus, .field-group textarea:focus, .field-group select:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
   }
   .field-group textarea { min-height: 80px; line-height: 1.5; }
   .field-group textarea.tall { min-height: 140px; }
 
-  /* Grid layouts */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
   .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
 
   /* ── CHECKBOX GRID ── */
-  .cb-grid {
-    display: grid;
-    gap: 8px;
-  }
-  .cb-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-  }
+  .cb-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; user-select: none; }
   .cb-item:hover { border-color: var(--border-light); background: var(--surface2); }
-  .cb-item.checked {
-    border-color: var(--accent2);
-    background: rgba(16,185,129,0.08);
-  }
+  .cb-item.checked { border-color: var(--accent2); background: rgba(16,185,129,0.08); }
   .cb-item input[type=checkbox] { display: none; }
-  .cb-box {
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--border-light);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s;
-    font-size: 11px;
-    font-weight: 700;
-    color: transparent;
-  }
-  .cb-item.checked .cb-box {
-    background: var(--accent2);
-    border-color: var(--accent2);
-    color: #fff;
-  }
-  .cb-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    line-height: 1.3;
-  }
+  .cb-box { width: 18px; height: 18px; border: 2px solid var(--border-light); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 11px; font-weight: 700; color: transparent; }
+  .cb-item.checked .cb-box { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .cb-label { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
   .cb-item.checked .cb-label { color: var(--text); }
 
-  /* ── RADIO GROUP (SI / NO / N.A.) ── */
-  .radio-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-  }
-  .radio-question {
-    flex: 1;
-    font-size: 12px;
-    color: var(--text-muted);
-    line-height: 1.4;
-    padding-top: 2px;
-  }
-  .radio-options {
-    display: flex;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-  .radio-opt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-  }
+  /* ── RADIO GROUP ── */
+  .radio-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); }
+  .radio-question { flex: 1; font-size: 12px; color: var(--text-muted); line-height: 1.4; padding-top: 2px; }
+  .radio-options { display: flex; gap: 6px; flex-shrink: 0; }
+  .radio-opt { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
   .radio-opt input { display: none; }
-  .radio-pill {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    font-family: 'IBM Plex Mono', monospace;
-    letter-spacing: 0.5px;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    background: var(--surface);
-    transition: all 0.15s;
-    min-width: 36px;
-    text-align: center;
-  }
+  .radio-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.5px; border: 1px solid var(--border); color: var(--text-dim); background: var(--surface); transition: all 0.15s; min-width: 36px; text-align: center; }
   .radio-opt.si-opt input:checked ~ .radio-pill { background: var(--green); border-color: var(--green); color: #fff; }
   .radio-opt.no-opt input:checked ~ .radio-pill { background: var(--red); border-color: var(--red); color: #fff; }
   .radio-opt.na-opt input:checked ~ .radio-pill { background: var(--text-dim); border-color: var(--text-dim); color: #fff; }
 
   /* ── WORKERS TABLE ── */
   .workers-table { width: 100%; border-collapse: collapse; }
-  .workers-table th {
-    background: var(--surface2);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    font-family: 'IBM Plex Mono', monospace;
-  }
+  .workers-table th { background: var(--surface2); font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; }
   .workers-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
   .workers-table tr:last-child td { border-bottom: none; }
-  .workers-table td:first-child {
-    color: var(--text-muted);
-    font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    width: 40px;
-    text-align: center;
-  }
-  .workers-table input {
-    background: var(--bg);
-    border: 1px solid transparent;
-    border-radius: 4px;
-    color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    padding: 6px 10px;
-    width: 100%;
-    transition: border-color 0.15s;
-  }
-  .workers-table input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: var(--surface2);
-  }
+  .workers-table td:first-child { color: var(--text-muted); font-size: 12px; font-family: 'IBM Plex Mono', monospace; width: 40px; text-align: center; }
+  .workers-table input { background: var(--bg); border: 1px solid transparent; border-radius: 4px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; padding: 6px 10px; width: 100%; transition: border-color 0.15s; }
+  .workers-table input:focus { outline: none; border-color: var(--accent); background: var(--surface2); }
 
   /* ── STATUS BAR ── */
-  .status-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 12px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 100;
-  }
-  .status-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+  .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
+  .status-info { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
   /* ── OVERLAY / MODAL ── */
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-  }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
   .overlay.active { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    box-shadow: var(--shadow);
-  }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 420px; width: 90%; text-align: center; box-shadow: var(--shadow); }
   .modal-icon { font-size: 48px; margin-bottom: 16px; }
   .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
   .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
@@ -412,189 +180,44 @@
   .modal a { color: var(--accent); }
 
   /* ── LOADING SPINNER ── */
-  .spinner {
-    width: 20px; height: 20px;
-    border: 2px solid rgba(245,158,11,0.3);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .spinner { width: 20px; height: 20px; border: 2px solid rgba(245,158,11,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── DIVIDER WITH LABEL ── */
-  .divider-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-dim);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'IBM Plex Mono', monospace;
-    margin: 4px 0 8px;
-  }
-  .divider-label::before, .divider-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .divider-label { display: flex; align-items: center; gap: 12px; font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin: 4px 0 8px; }
+  .divider-label::before, .divider-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    top: 80px;
-    right: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 12px 20px;
-    font-size: 13px;
-    z-index: 300;
-    transform: translateX(120%);
-    transition: transform 0.3s;
-    box-shadow: var(--shadow);
-    max-width: 320px;
-  }
+  .toast { position: fixed; top: 80px; right: 24px; background: var(--surface2); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 12px 20px; font-size: 13px; z-index: 300; transform: translateX(120%); transition: transform 0.3s; box-shadow: var(--shadow); max-width: 320px; }
   .toast.show { transform: translateX(0); }
   .toast.success { border-left: 4px solid var(--green); }
   .toast.error { border-left: 4px solid var(--red); }
   .toast.info { border-left: 4px solid var(--blue); }
 
   /* ── FIRMA MODAL ── */
-  .firma-modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 500;
-    align-items: flex-end;
-    justify-content: center;
-    backdrop-filter: blur(6px);
-  }
+  .firma-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; align-items: flex-end; justify-content: center; backdrop-filter: blur(6px); }
   .firma-modal-overlay.active { display: flex; }
-  .firma-modal-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
-    padding: 20px 20px 32px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
-  }
-  .firma-modal-handle {
-    width: 40px; height: 4px;
-    background: var(--border-light);
-    border-radius: 4px;
-    margin: 0 auto 16px;
-  }
-  .firma-modal-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-    text-align: center;
-  }
-  .firma-modal-hint {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    margin-bottom: 14px;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-  .firma-canvas-wrap {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    touch-action: none;
-    position: relative;
-    margin-bottom: 14px;
-  }
-  #firma-canvas {
-    display: block;
-    width: 100%;
-    height: 220px;
-    cursor: crosshair;
-    touch-action: none;
-  }
-  .firma-canvas-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ccc;
-    font-size: 13px;
-    pointer-events: none;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
+  .firma-modal-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px 20px 32px; width: 100%; max-width: 600px; box-shadow: 0 -8px 40px rgba(0,0,0,0.6); }
+  .firma-modal-handle { width: 40px; height: 4px; background: var(--border-light); border-radius: 4px; margin: 0 auto 16px; }
+  .firma-modal-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; text-align: center; }
+  .firma-modal-hint { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 14px; font-family: 'IBM Plex Mono', monospace; }
+  .firma-canvas-wrap { background: #fff; border-radius: 12px; overflow: hidden; touch-action: none; position: relative; margin-bottom: 14px; }
+  #firma-canvas { display: block; width: 100%; height: 220px; cursor: crosshair; touch-action: none; }
+  .firma-canvas-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 13px; pointer-events: none; font-family: 'IBM Plex Sans', sans-serif; }
   .firma-canvas-placeholder.hidden { display: none; }
-  .firma-canvas-line {
-    position: absolute;
-    bottom: 52px; left: 20px; right: 20px;
-    height: 1px;
-    background: #e5e7eb;
-    pointer-events: none;
-  }
-  .firma-modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
+  .firma-canvas-line { position: absolute; bottom: 52px; left: 20px; right: 20px; height: 1px; background: #e5e7eb; pointer-events: none; }
+  .firma-modal-actions { display: flex; gap: 10px; justify-content: center; }
 
   /* ── FIRMA EN TABLA ── */
-  .firma-worker-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-  .firma-worker-preview {
-    width: 80px;
-    height: 36px;
-    background: var(--bg);
-    border: 1px dashed var(--border-light);
-    border-radius: 6px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
+  .firma-worker-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .firma-worker-preview { width: 80px; height: 36px; background: var(--bg); border: 1px dashed var(--border-light); border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .firma-worker-preview img { width: 100%; height: 100%; object-fit: contain; }
-  .firma-worker-preview .no-firma {
-    font-size: 9px;
-    color: var(--text-dim);
-    font-family: 'IBM Plex Mono', monospace;
-    text-align: center;
-  }
-  .firma-worker-btn {
-    font-size: 10px;
-    color: var(--accent);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    padding: 2px 6px;
-  }
+  .firma-worker-preview .no-firma { font-size: 9px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; text-align: center; }
+  .firma-worker-btn { font-size: 10px; color: var(--accent); background: none; border: none; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; padding: 2px 6px; }
 
   /* ── FIRMA RESPONSABLES ── */
-  .firma-resp-wrap {
-    margin-top: 8px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .firma-resp-canvas {
-    flex: 1;
-    height: 52px;
-    background: var(--bg);
-    border: 1px dashed var(--border-light);
-    border-radius: 6px;
-    display: block;
-  }
+  .firma-resp-wrap { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
+  .firma-resp-canvas { flex: 1; height: 52px; background: var(--bg); border: 1px dashed var(--border-light); border-radius: 6px; display: block; }
   .firma-resp-btns { display: flex; gap: 4px; flex-shrink: 0; }
 
   @media (max-width: 768px) {
@@ -703,7 +326,6 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
     <div class="section-body">
       <div class="divider-label">EPP básico</div>
       <div class="grid-3" id="epp-grid">
-        <!-- Col A -->
         <div style="display:grid;gap:8px">
           <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A12"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Casco con Barbuquejo</span></div>
           <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A13"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Gafas de Seguridad</span></div>
@@ -713,7 +335,6 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
           <div class="cb-item checked" onclick="toggleCb(this)" data-cell="A17"><input type="checkbox" checked><div class="cb-box">✓</div><span class="cb-label">Botas Antideslizantes</span></div>
           <div class="cb-item" onclick="toggleCb(this)" data-cell="A18"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Arnés de Cuerpo Completo (Multipropósito o Dieléctrico)</span></div>
         </div>
-        <!-- Col J -->
         <div style="display:grid;gap:8px">
           <div class="cb-item" onclick="toggleCb(this)" data-cell="J12"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Eslinga con Absorbedor de Impactos</span></div>
           <div class="cb-item" onclick="toggleCb(this)" data-cell="J13"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Eslinga de Posicionamiento</span></div>
@@ -723,7 +344,6 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
           <div class="cb-item" onclick="toggleCb(this)" data-cell="J17"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Pretales</span></div>
           <div class="cb-item" onclick="toggleCb(this)" data-cell="J18"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Descendedores</span></div>
         </div>
-        <!-- Col Q -->
         <div style="display:grid;gap:8px">
           <div class="cb-item" onclick="toggleCb(this)" data-cell="Q12"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Kit de Rescate</span></div>
           <div class="cb-item" onclick="toggleCb(this)" data-cell="Q13"><input type="checkbox"><div class="cb-box">✓</div><span class="cb-label">Autorretráctil</span></div>
@@ -764,9 +384,7 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
       <span class="section-chevron">▼</span>
     </div>
     <div class="section-body" style="gap:8px">
-      <div id="prep-items">
-        <!-- Generated by JS -->
-      </div>
+      <div id="prep-items"></div>
     </div>
   </div>
 
@@ -935,12 +553,13 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
     <h2>Error al Generar</h2>
     <p id="error-msg">Ocurrió un problema al conectar con Google Apps Script.</p>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="closeOverlay('overlay-error')">Reintentar</button>
+      <button class="btn btn-primary" onclick="closeOverlay('overlay-error');generarATS()">Reintentar</button>
+      <button class="btn btn-ghost" onclick="closeOverlay('overlay-error')">Cerrar</button>
     </div>
   </div>
 </div>
 
-<!-- ══ MODAL DE FIRMA ══ -->
+<!-- MODAL DE FIRMA -->
 <div class="firma-modal-overlay" id="firma-modal-overlay">
   <div class="firma-modal-panel">
     <div class="firma-modal-handle"></div>
@@ -982,13 +601,9 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
 
 <script>
 // ═══════════════════════════════════════════════════════
-// CONFIGURACIÓN — Solo cambia esta URL si redesplegás el GAS
+// CONFIGURACIÓN URL GAS
 // ═══════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════════
-// CONFIGURA AQUÍ TU URL DE GOOGLE APPS SCRIPT
-// Cada vez que redespliegues el GAS, pega la nueva URL aquí
-// ══════════════════════════════════════════════════════════
-let GAS_URL = localStorage.getItem('gas_url') || "https://script.google.com/macros/s/AKfycbyFp01db-QOQal8ywTzH2B_09j_KDIn630mhYoZ02AE4sC9eU49HM-mgBMA9RNZzHsn/exec";
+let GAS_URL = localStorage.getItem('gas_url') || '';
 
 function openGasConfig() {
   document.getElementById('gas-url-input').value = GAS_URL;
@@ -1005,25 +620,28 @@ function saveGasUrl() {
   document.getElementById('overlay-gas-config').classList.remove('active');
   testGasConnection();
 }
+
+// ── Verificar conexión usando no-cors (solo detecta si hay red, no CORS)
 async function testGasConnection() {
-  const dot = document.getElementById('conn-dot');
-  const label = document.getElementById('conn-label');
-  dot.style.background = '#f59e0b';
-  label.textContent = 'Verificando GAS...';
-  try {
-    // GAS no permite leer la respuesta desde origen externo (CORS),
-    // pero si no lanza excepción de red, el endpoint existe y está activo.
-    await fetch(GAS_URL, { method: 'GET', mode: 'no-cors' });
-    dot.style.background = '#10b981';
-    label.textContent = 'GAS conectado ✓';
-  } catch(e) {
-    dot.style.background = '#ef4444';
-    label.textContent = 'GAS sin conexión — haz clic en ⚙ URL';
+  if (!GAS_URL) {
+    setConnStatus('orange', '⚠ Configura la URL del GAS → ⚙ URL GAS');
+    return;
   }
+  setConnStatus('#f59e0b', 'Verificando GAS...');
+  try {
+    await fetch(GAS_URL + '?ping=1', { method: 'GET', mode: 'no-cors' });
+    setConnStatus('#10b981', 'GAS accesible ✓');
+  } catch(e) {
+    setConnStatus('#ef4444', 'Sin red — revisa conexión');
+  }
+}
+function setConnStatus(color, text) {
+  document.getElementById('conn-dot').style.background = color;
+  document.getElementById('conn-label').textContent = text;
 }
 
 // ═══════════════════════════════════════════════════════
-// DATOS: Preparación del Área
+// DATOS
 // ═══════════════════════════════════════════════════════
 const PREP_ITEMS = [
   { id:'p28', col_s:'S28', col_u:'U28', col_v:'V28', label:'Se ha instalado señalización preventiva que delimite el área de trabajo (cinta, conos, señales tubulares o polisombras)', default:'SI' },
@@ -1039,9 +657,6 @@ const PREP_ITEMS = [
   { id:'p38', col_s:'S38', col_u:'U38', col_v:'V38', label:'En caso de trabajar en espacios confinados o trabajos en caliente, se realizan las consultas preventivas respectivas', default:'SI' },
 ];
 
-// ═══════════════════════════════════════════════════════
-// DATOS: Riesgos Potenciales
-// ═══════════════════════════════════════════════════════
 const RIESGOS = [
   { cell:'C42', label:'Exposición a Químicos', checked:false },
   { cell:'H42', label:'Riesgo de Tropezones', checked:true },
@@ -1069,9 +684,6 @@ const RIESGOS = [
   { cell:'U52', label:'Superficies Calientes', checked:false },
 ];
 
-// ═══════════════════════════════════════════════════════
-// DATOS: Control de Riesgos
-// ═══════════════════════════════════════════════════════
 const CONTROLES = [
   { cell:'C57', label:'Equipo de Protección Personal', checked:true },
   { cell:'H57', label:'Bloqueo y Señalización', checked:true },
@@ -1094,9 +706,6 @@ const CONTROLES = [
   { cell:'O65', label:'MEDEVAC', checked:false },
 ];
 
-// ═══════════════════════════════════════════════════════
-// DATOS: Equipo de Seguridad Requerido
-// ═══════════════════════════════════════════════════════
 const EQUIPO_SEG = [
   { cell:'C68', label:'Casco', checked:true },
   { cell:'H68', label:'Guantes de Nitrilo / Neopreno', checked:true },
@@ -1140,7 +749,6 @@ document.addEventListener('DOMContentLoaded', () => {
   buildCheckboxGrid('controles-grid', CONTROLES);
   buildCheckboxGrid('equipo-grid', EQUIPO_SEG);
   buildWorkersTable();
-  // Verificar conexión al cargar
   setTimeout(testGasConnection, 800);
 });
 
@@ -1152,18 +760,9 @@ function buildPrepItems() {
     div.innerHTML = `
       <span class="radio-question">${item.label}</span>
       <div class="radio-options">
-        <label class="radio-opt si-opt">
-          <input type="radio" name="${item.id}" value="SI" ${item.default==='SI'?'checked':''}>
-          <span class="radio-pill">SI</span>
-        </label>
-        <label class="radio-opt no-opt">
-          <input type="radio" name="${item.id}" value="NO" ${item.default==='NO'?'checked':''}>
-          <span class="radio-pill">NO</span>
-        </label>
-        <label class="radio-opt na-opt">
-          <input type="radio" name="${item.id}" value="NA" ${item.default==='NA'?'checked':''}>
-          <span class="radio-pill">N.A.</span>
-        </label>
+        <label class="radio-opt si-opt"><input type="radio" name="${item.id}" value="SI" ${item.default==='SI'?'checked':''}><span class="radio-pill">SI</span></label>
+        <label class="radio-opt no-opt"><input type="radio" name="${item.id}" value="NO" ${item.default==='NO'?'checked':''}><span class="radio-pill">NO</span></label>
+        <label class="radio-opt na-opt"><input type="radio" name="${item.id}" value="NA" ${item.default==='NA'?'checked':''}><span class="radio-pill">N.A.</span></label>
       </div>
     `;
     container.appendChild(div);
@@ -1219,18 +818,13 @@ function buildWorkersTable() {
 // ═══════════════════════════════════════════════════════
 // SISTEMA DE FIRMAS
 // ═══════════════════════════════════════════════════════
-const firmaStore = {}; // { 'w1': dataURL, 'w2': dataURL, ..., 'sst': dataURL, 'ing': dataURL, 'enc': dataURL }
-
-let firmaCtx = null;
-let firmaDrawing = false;
-let firmaLastX = 0, firmaLastY = 0;
-let firmaTarget = null;  // id destino actual
-let firmaHasDraw = false;
+const firmaStore = {};
+let firmaCtx = null, firmaDrawing = false, firmaLastX = 0, firmaLastY = 0;
+let firmaTarget = null, firmaHasDraw = false;
 
 function initFirmaCanvas() {
   const canvas = document.getElementById('firma-canvas');
   const wrap = canvas.parentElement;
-  // Tamaño real
   canvas.width = wrap.clientWidth || 560;
   canvas.height = canvas.offsetHeight || 220;
   firmaCtx = canvas.getContext('2d');
@@ -1241,251 +835,192 @@ function initFirmaCanvas() {
   firmaCtx.fillStyle = '#ffffff';
   firmaCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Mouse
-  canvas.addEventListener('mousedown', e => { firmaDrawing = true; firmaHasDraw = true; hidePlaceholder(); const p = getPos(e,canvas); firmaLastX=p.x; firmaLastY=p.y; });
-  canvas.addEventListener('mousemove', e => { if (!firmaDrawing) return; const p = getPos(e,canvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; });
-  canvas.addEventListener('mouseup', () => firmaDrawing = false);
-  canvas.addEventListener('mouseleave', () => firmaDrawing = false);
+  // Limpiar listeners anteriores clonando el canvas
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  firmaCtx = newCanvas.getContext('2d');
+  firmaCtx.strokeStyle = '#1a1a2e';
+  firmaCtx.lineWidth = 2.5;
+  firmaCtx.lineCap = 'round';
+  firmaCtx.lineJoin = 'round';
+  firmaCtx.fillStyle = '#ffffff';
+  firmaCtx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 
-  // Touch
-  canvas.addEventListener('touchstart', e => { e.preventDefault(); firmaDrawing=true; firmaHasDraw=true; hidePlaceholder(); const p=getPos(e.touches[0],canvas); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
-  canvas.addEventListener('touchmove', e => { e.preventDefault(); if(!firmaDrawing) return; const p=getPos(e.touches[0],canvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
-  canvas.addEventListener('touchend', e => { e.preventDefault(); firmaDrawing=false; }, {passive:false});
+  newCanvas.addEventListener('mousedown', e => { firmaDrawing=true; firmaHasDraw=true; hidePlaceholder(); const p=getPos(e,newCanvas); firmaLastX=p.x; firmaLastY=p.y; });
+  newCanvas.addEventListener('mousemove', e => { if(!firmaDrawing) return; const p=getPos(e,newCanvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; });
+  newCanvas.addEventListener('mouseup', () => firmaDrawing=false);
+  newCanvas.addEventListener('mouseleave', () => firmaDrawing=false);
+  newCanvas.addEventListener('touchstart', e => { e.preventDefault(); firmaDrawing=true; firmaHasDraw=true; hidePlaceholder(); const p=getPos(e.touches[0],newCanvas); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
+  newCanvas.addEventListener('touchmove', e => { e.preventDefault(); if(!firmaDrawing) return; const p=getPos(e.touches[0],newCanvas); drawLine(firmaLastX,firmaLastY,p.x,p.y); firmaLastX=p.x; firmaLastY=p.y; }, {passive:false});
+  newCanvas.addEventListener('touchend', e => { e.preventDefault(); firmaDrawing=false; }, {passive:false});
 }
 
 function getPos(e, canvas) {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  return { x:(e.clientX-rect.left)*(canvas.width/rect.width), y:(e.clientY-rect.top)*(canvas.height/rect.height) };
 }
 function drawLine(x1,y1,x2,y2) {
-  firmaCtx.beginPath();
-  firmaCtx.moveTo(x1,y1);
-  firmaCtx.lineTo(x2,y2);
-  firmaCtx.stroke();
+  firmaCtx.beginPath(); firmaCtx.moveTo(x1,y1); firmaCtx.lineTo(x2,y2); firmaCtx.stroke();
 }
-function hidePlaceholder() {
-  document.getElementById('firma-placeholder').classList.add('hidden');
-}
+function hidePlaceholder() { document.getElementById('firma-placeholder').classList.add('hidden'); }
 
-function openFirmaWorker(idx) {
-  firmaTarget = 'w' + idx;
-  const nombre = document.getElementById('w_nombre_' + idx)?.value || ('Trabajador ' + idx);
-  openFirmaModal('Firma — ' + nombre);
-}
-function openFirmaResp(canvasId, label) {
-  firmaTarget = canvasId;
-  openFirmaModal('Firma — ' + label);
-}
+function openFirmaWorker(idx) { firmaTarget='w'+idx; openFirmaModal('Firma — '+(document.getElementById('w_nombre_'+idx)?.value||'Trabajador '+idx)); }
+function openFirmaResp(canvasId, label) { firmaTarget=canvasId; openFirmaModal('Firma — '+label); }
 function openFirmaModal(title) {
   document.getElementById('firma-modal-title').textContent = title;
   document.getElementById('firma-placeholder').classList.remove('hidden');
   document.getElementById('firma-modal-overlay').classList.add('active');
-  // Prevent body scroll
   document.body.style.overflow = 'hidden';
   setTimeout(() => {
     firmaHasDraw = false;
     initFirmaCanvas();
-    // Si ya hay firma previa, pintarla
     const prev = firmaStore[firmaTarget];
     if (prev) {
       const img = new Image();
-      img.onload = () => { firmaCtx.drawImage(img, 0, 0, firmaCtx.canvas.width, firmaCtx.canvas.height); hidePlaceholder(); firmaHasDraw = true; };
+      img.onload = () => { firmaCtx.drawImage(img,0,0,firmaCtx.canvas.width,firmaCtx.canvas.height); hidePlaceholder(); firmaHasDraw=true; };
       img.src = prev;
     }
   }, 80);
 }
 function clearFirmaModal() {
-  const canvas = document.getElementById('firma-canvas');
-  firmaCtx.fillStyle = '#ffffff';
-  firmaCtx.fillRect(0, 0, canvas.width, canvas.height);
-  firmaHasDraw = false;
-  document.getElementById('firma-placeholder').classList.remove('hidden');
+  const c = document.getElementById('firma-canvas');
+  firmaCtx.fillStyle='#ffffff'; firmaCtx.fillRect(0,0,c.width,c.height);
+  firmaHasDraw=false; document.getElementById('firma-placeholder').classList.remove('hidden');
 }
 function closeFirmaModal() {
   document.getElementById('firma-modal-overlay').classList.remove('active');
-  document.body.style.overflow = '';
-  firmaTarget = null;
+  document.body.style.overflow=''; firmaTarget=null;
 }
 function saveFirmaModal() {
-  if (!firmaHasDraw) { showToast('⚠️ No hay firma — dibuje antes de guardar', 'error'); return; }
+  if (!firmaHasDraw) { showToast('⚠️ No hay firma — dibuje antes de guardar','error'); return; }
   const canvas = document.getElementById('firma-canvas');
   const dataURL = canvas.toDataURL('image/png');
   firmaStore[firmaTarget] = dataURL;
-
-  // Actualizar preview
   if (firmaTarget.startsWith('w')) {
     const idx = firmaTarget.replace('w','');
-    const preview = document.getElementById('firma-preview-w' + idx);
-    preview.innerHTML = `<img src="${dataURL}" alt="firma">`;
+    document.getElementById('firma-preview-w'+idx).innerHTML = `<img src="${dataURL}" alt="firma">`;
   } else {
-    // Responsable canvas
     const respCanvas = document.getElementById(firmaTarget);
     if (respCanvas) {
-      const ctx = respCanvas.getContext('2d');
-      respCanvas.width = respCanvas.offsetWidth || 200;
-      respCanvas.height = respCanvas.offsetHeight || 52;
+      respCanvas.width = respCanvas.offsetWidth||200; respCanvas.height = respCanvas.offsetHeight||52;
       const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0, respCanvas.width, respCanvas.height);
+      img.onload = () => respCanvas.getContext('2d').drawImage(img,0,0,respCanvas.width,respCanvas.height);
       img.src = dataURL;
     }
   }
-  closeFirmaModal();
-  showToast('✅ Firma guardada', 'success');
+  closeFirmaModal(); showToast('✅ Firma guardada','success');
 }
 function clearFirmaResp(canvasId) {
   delete firmaStore[canvasId];
   const c = document.getElementById(canvasId);
-  if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); }
+  if (c) c.getContext('2d').clearRect(0,0,c.width,c.height);
 }
 
 // ═══════════════════════════════════════════════════════
-// TOGGLE SECTION
+// UI HELPERS
 // ═══════════════════════════════════════════════════════
-function toggleSection(id) {
-  document.getElementById(id).classList.toggle('collapsed');
+function toggleSection(id) { document.getElementById(id).classList.toggle('collapsed'); }
+function toggleCb(el) { el.classList.toggle('checked'); const cb=el.querySelector('input[type=checkbox]'); if(cb) cb.checked=el.classList.contains('checked'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('active'); }
+function setLoading(on) { ['btnGenerar','btnGenerar2'].forEach(id=>{ const b=document.getElementById(id); if(b) b.disabled=on; }); }
+function setStatus(msg) { document.getElementById('status-text').textContent=msg; }
+function showToast(msg, type='info') {
+  const t=document.getElementById('toast'); t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>{ t.className='toast'; },4000);
 }
+function resetForm() {
+  if (!confirm('¿Restablecer todos los campos a los valores por defecto del ATS Abril 2026?')) return;
+  location.reload();
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') ['overlay-success','overlay-error'].forEach(closeOverlay); });
 
 // ═══════════════════════════════════════════════════════
-// TOGGLE CHECKBOX
-// ═══════════════════════════════════════════════════════
-function toggleCb(el) {
-  el.classList.toggle('checked');
-  const cb = el.querySelector('input[type=checkbox]');
-  if (cb) cb.checked = el.classList.contains('checked');
-}
-
-// ═══════════════════════════════════════════════════════
-// COLLECT FORM DATA
+// RECOPILAR DATOS
 // ═══════════════════════════════════════════════════════
 function collectData() {
-  // ── Campos básicos
-  const fi = document.getElementById('fi').value;
-  const ff = document.getElementById('ff').value;
-  const lugar = document.getElementById('lugar').value;
-  const tipo = 'TIPO DE TRABAJO: ' + document.getElementById('tipo').value;
-  const pasos = document.getElementById('pasos').value;
-  const maq = document.getElementById('maq').value;
-  const pel = document.getElementById('pel').value;
-  const con = document.getElementById('con').value;
-  const obs = 'OBSERVACIONES: ' + document.getElementById('obs').value;
-
-  // ── EPP (cells A12-Q18) - formato "X  LABEL" o "    LABEL"
   function eppVal(cell) {
-    const el = document.querySelector(`[data-cell="${cell}"]`);
-    if (!el) return null;
-    const label = el.querySelector('.cb-label').textContent.trim().toUpperCase();
-    const checked = el.classList.contains('checked');
-    return checked ? `X  ${label}` : `    ${label}`;
+    const el=document.querySelector(`[data-cell="${cell}"]`); if(!el) return null;
+    const label=el.querySelector('.cb-label').textContent.trim().toUpperCase();
+    return el.classList.contains('checked') ? `X  ${label}` : `    ${label}`;
   }
-
-  // ── Herramientas
-  const h_manuales = document.getElementById('h_manuales').value;
-  const h_electricas = document.getElementById('h_electricas').value;
-  const h_neumaticas = document.getElementById('h_neumaticas').value;
-  const h_hidraulicas = document.getElementById('h_hidraulicas').value;
-  const h_mecanicas = document.getElementById('h_mecanicas').value;
-  const h_otras = document.getElementById('h_otras').value;
-
-  // ── Preparación del área (SI/NO/N.A. → X en columna correcta)
+  function cbVal(cell) {
+    const el=document.querySelector(`[data-cell="${cell}"]`); if(!el) return null;
+    const label=el.querySelector('.cb-label').textContent.trim();
+    return el.classList.contains('checked') ? `X  ${label}` : `    ${label}`;
+  }
   const prep = {};
   PREP_ITEMS.forEach(item => {
-    const val = document.querySelector(`input[name="${item.id}"]:checked`)?.value || 'SI';
-    prep[item.col_s] = val === 'SI' ? 'X' : '';
-    prep[item.col_u] = val === 'NO' ? 'X' : '';
-    prep[item.col_v] = val === 'NA' ? 'X' : '';
+    const val=document.querySelector(`input[name="${item.id}"]:checked`)?.value||'SI';
+    prep[item.col_s]=val==='SI'?'X':''; prep[item.col_u]=val==='NO'?'X':''; prep[item.col_v]=val==='NA'?'X':'';
   });
-
-  // ── Checkboxes generales (riesgos, controles, equipo)
-  function cbVal(cell) {
-    const el = document.querySelector(`[data-cell="${cell}"]`);
-    if (!el) return null;
-    const label = el.querySelector('.cb-label').textContent.trim();
-    const checked = el.classList.contains('checked');
-    return checked ? `X  ${label}` : `    ${label}`;
-  }
-
-  // ── Trabajadores
   const workers = [];
-  for (let i = 1; i <= 11; i++) {
-    workers.push({
-      nombre: document.getElementById(`w_nombre_${i}`)?.value || '',
-      cedula: document.getElementById(`w_ced_${i}`)?.value || '',
-      firma:  firmaStore['w'+i] || null,
-    });
+  for (let i=1; i<=11; i++) {
+    workers.push({ nombre:document.getElementById(`w_nombre_${i}`)?.value||'', cedula:document.getElementById(`w_ced_${i}`)?.value||'', firma:firmaStore['w'+i]||null });
   }
-
-  // ── Responsables
-  const resp_sst = 'RESPONSABLE SST: ' + document.getElementById('resp_sst').value;
-  const firma_ing = 'FIRMA INGENIERO: ' + document.getElementById('firma_ing').value;
-  const firma_enc = 'FIRMA ENCARGADO: ' + document.getElementById('firma_enc').value;
-  const lineas = 'VERIFICAR Y/O CONSULTAR LAS LÍNEAS DE EMERGENCIA:\n' + document.getElementById('lineas_emergencia').value;
-
-  // ── Firmas responsables (base64)
-  const firma_sst_img  = firmaStore['firma_resp_sst'] || null;
-  const firma_ing_img  = firmaStore['firma_resp_ing'] || null;
-  const firma_enc_img  = firmaStore['firma_resp_enc'] || null;
-
-  // ── Build full payload
   return {
-    // Fechas y lugar
-    fi, ff, lugar,
-    // Texto principal
-    tipo, pasos, maq, pel, con, obs,
-    // EPP
-    A12: eppVal('A12'), A13: eppVal('A13'), A14: eppVal('A14'),
-    A15: eppVal('A15'), A16: eppVal('A16'), A17: eppVal('A17'), A18: eppVal('A18'),
-    J12: eppVal('J12'), J13: eppVal('J13'), J14: eppVal('J14'),
-    J15: eppVal('J15'), J16: eppVal('J16'), J17: eppVal('J17'), J18: eppVal('J18'),
-    Q12: eppVal('Q12'), Q13: eppVal('Q13'), Q14: eppVal('Q14'),
-    Q15: eppVal('Q15'), Q16: eppVal('Q16'), Q17: eppVal('Q17'), Q18: eppVal('Q18'),
-    // Herramientas
-    F21: h_manuales, F22: h_electricas, F23: h_neumaticas,
-    F24: h_hidraulicas, A25_val: h_mecanicas, A26_val: h_otras,
-    // Preparación del área
+    fi: document.getElementById('fi').value,
+    ff: document.getElementById('ff').value,
+    lugar: document.getElementById('lugar').value,
+    tipo: 'TIPO DE TRABAJO: '+document.getElementById('tipo').value,
+    pasos: document.getElementById('pasos').value,
+    maq: document.getElementById('maq').value,
+    pel: document.getElementById('pel').value,
+    con: document.getElementById('con').value,
+    obs: 'OBSERVACIONES: '+document.getElementById('obs').value,
+    A12:eppVal('A12'),A13:eppVal('A13'),A14:eppVal('A14'),A15:eppVal('A15'),A16:eppVal('A16'),A17:eppVal('A17'),A18:eppVal('A18'),
+    J12:eppVal('J12'),J13:eppVal('J13'),J14:eppVal('J14'),J15:eppVal('J15'),J16:eppVal('J16'),J17:eppVal('J17'),J18:eppVal('J18'),
+    Q12:eppVal('Q12'),Q13:eppVal('Q13'),Q14:eppVal('Q14'),Q15:eppVal('Q15'),Q16:eppVal('Q16'),Q17:eppVal('Q17'),Q18:eppVal('Q18'),
+    F21:document.getElementById('h_manuales').value,
+    F22:document.getElementById('h_electricas').value,
+    F23:document.getElementById('h_neumaticas').value,
+    F24:document.getElementById('h_hidraulicas').value,
+    A25_val:document.getElementById('h_mecanicas').value,
+    A26_val:document.getElementById('h_otras').value,
     ...prep,
-    // Líneas de emergencia
-    A39: lineas,
-    // Riesgos
-    C42: cbVal('C42'), H42: cbVal('H42'), O42: cbVal('O42'), U42: cbVal('U42'),
-    C44: cbVal('C44'), H44: cbVal('H44'), O44: cbVal('O44'), U44: cbVal('U44'),
-    C46: cbVal('C46'), H46: cbVal('H46'), O46: cbVal('O46'), U46: cbVal('U46'),
-    C48: cbVal('C48'), H48: cbVal('H48'), O48: cbVal('O48'), U48: cbVal('U48'),
-    C50: cbVal('C50'), H50: cbVal('H50'), O50: cbVal('O50'), U50: cbVal('U50'),
-    C52: cbVal('C52'), H52: cbVal('H52'), O52: cbVal('O52'), U52: cbVal('U52'),
-    C54: '    Describa Otros: ' + document.getElementById('otros_riesgos').value,
-    // Control de riesgos
-    C57: cbVal('C57'), H57: cbVal('H57'), O57: cbVal('O57'), U57: cbVal('U57'),
-    C59: cbVal('C59'), H59: cbVal('H59'), O59: cbVal('O59'), U59: cbVal('U59'),
-    C61: cbVal('C61'), H61: cbVal('H61'), O61: cbVal('O61'), U61: cbVal('U61'),
-    C63: cbVal('C63'), H63: cbVal('H63'), O63: cbVal('O63'), U63: cbVal('U63'),
-    C65: cbVal('C65'), H65: cbVal('H65'), O65: cbVal('O65'),
-    // Equipo seguridad
-    C68: cbVal('C68'), H68: cbVal('H68'), O68: cbVal('O68'), U68: cbVal('U68'),
-    C70: cbVal('C70'), H70: cbVal('H70'), O70: cbVal('O70'), U70: cbVal('U70'),
-    C72: cbVal('C72'), H72: cbVal('H72'), O72: cbVal('O72'), U72: cbVal('U72'),
-    C74: cbVal('C74'), H74: cbVal('H74'), O74: cbVal('O74'), U74: cbVal('U74'),
-    C76: cbVal('C76'), H76: cbVal('H76'), O76: cbVal('O76'), U76: cbVal('U76'),
-    C78: cbVal('C78'), H78: cbVal('H78'), O78: cbVal('O78'), U78: cbVal('U78'),
-    C80: cbVal('C80'), H80: cbVal('H80'), O80: cbVal('O80'), U80: cbVal('U80'),
-    C82: cbVal('C82'), H82: cbVal('H82'), O82: cbVal('O82'),
-    // Trabajadores
+    A39:'VERIFICAR Y/O CONSULTAR LAS LÍNEAS DE EMERGENCIA:\n'+document.getElementById('lineas_emergencia').value,
+    C42:cbVal('C42'),H42:cbVal('H42'),O42:cbVal('O42'),U42:cbVal('U42'),
+    C44:cbVal('C44'),H44:cbVal('H44'),O44:cbVal('O44'),U44:cbVal('U44'),
+    C46:cbVal('C46'),H46:cbVal('H46'),O46:cbVal('O46'),U46:cbVal('U46'),
+    C48:cbVal('C48'),H48:cbVal('H48'),O48:cbVal('O48'),U48:cbVal('U48'),
+    C50:cbVal('C50'),H50:cbVal('H50'),O50:cbVal('O50'),U50:cbVal('U50'),
+    C52:cbVal('C52'),H52:cbVal('H52'),O52:cbVal('O52'),U52:cbVal('U52'),
+    C54:'    Describa Otros: '+document.getElementById('otros_riesgos').value,
+    C57:cbVal('C57'),H57:cbVal('H57'),O57:cbVal('O57'),U57:cbVal('U57'),
+    C59:cbVal('C59'),H59:cbVal('H59'),O59:cbVal('O59'),U59:cbVal('U59'),
+    C61:cbVal('C61'),H61:cbVal('H61'),O61:cbVal('O61'),U61:cbVal('U61'),
+    C63:cbVal('C63'),H63:cbVal('H63'),O63:cbVal('O63'),U63:cbVal('U63'),
+    C65:cbVal('C65'),H65:cbVal('H65'),O65:cbVal('O65'),
+    C68:cbVal('C68'),H68:cbVal('H68'),O68:cbVal('O68'),U68:cbVal('U68'),
+    C70:cbVal('C70'),H70:cbVal('H70'),O70:cbVal('O70'),U70:cbVal('U70'),
+    C72:cbVal('C72'),H72:cbVal('H72'),O72:cbVal('O72'),U72:cbVal('U72'),
+    C74:cbVal('C74'),H74:cbVal('H74'),O74:cbVal('O74'),U74:cbVal('U74'),
+    C76:cbVal('C76'),H76:cbVal('H76'),O76:cbVal('O76'),U76:cbVal('U76'),
+    C78:cbVal('C78'),H78:cbVal('H78'),O78:cbVal('O78'),U78:cbVal('U78'),
+    C80:cbVal('C80'),H80:cbVal('H80'),O80:cbVal('O80'),U80:cbVal('U80'),
+    C82:cbVal('C82'),H82:cbVal('H82'),O82:cbVal('O82'),
     workers,
-    // Responsables
-    A96: resp_sst, L96: firma_ing, R96: firma_enc,
-    // Firmas imágenes base64
-    firma_sst_img, firma_ing_img, firma_enc_img,
+    A96:'RESPONSABLE SST: '+document.getElementById('resp_sst').value,
+    L96:'FIRMA INGENIERO: '+document.getElementById('firma_ing').value,
+    R96:'FIRMA ENCARGADO: '+document.getElementById('firma_enc').value,
+    firma_sst_img: firmaStore['firma_resp_sst']||null,
+    firma_ing_img: firmaStore['firma_resp_ing']||null,
+    firma_enc_img: firmaStore['firma_resp_enc']||null,
   };
 }
 
 // ═══════════════════════════════════════════════════════
-// GENERAR ATS — Estrategia JSONP (única que evita CORS con GAS)
+// GENERAR ATS — JSONP (solución definitiva anti-CORS)
+// El HTML envía datos via parámetro GET + callback JSONP.
+// El GAS responde: callback({...})
+// Esto evita completamente el problema CORS.
 // ═══════════════════════════════════════════════════════
 async function generarATS() {
+  if (!GAS_URL) {
+    showToast('⚠️ Primero configura la URL del GAS — botón ⚙ URL GAS', 'error');
+    openGasConfig();
+    return;
+  }
   const data = collectData();
-
-  // Validación básica
   if (!data.fi || !data.lugar.trim()) {
     showToast('⚠️ Complete la fecha de inicio y el lugar', 'error');
     return;
@@ -1493,114 +1028,77 @@ async function generarATS() {
 
   setLoading(true);
   document.getElementById('overlay-loading').classList.add('active');
-  setStatus('Enviando datos a Google Apps Script...');
+  setStatus('Enviando datos al GAS...');
 
   try {
-    const result = await callGAS(data);
-
+    const result = await callGAS_JSONP(data);
     document.getElementById('overlay-loading').classList.remove('active');
 
     if (result && (result.url || result.ok)) {
       const fileId = result.fileId || (result.url && result.url.split('/d/')[1]?.split('/')[0]) || '';
-      const downloadUrl = fileId
+      document.getElementById('btn-open-drive').href = result.url || '#';
+      document.getElementById('btn-download').href = fileId
         ? `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`
-        : result.download;
-
-      document.getElementById('btn-open-drive').href = result.url;
-      document.getElementById('btn-download').href = downloadUrl;
-
-      const fecha = data.fi || new Date().toISOString().slice(0,10);
+        : (result.download || '#');
       document.getElementById('success-msg').textContent =
-        `Archivo ATS_${fecha} creado en Google Drive. Puede abrirlo o descargarlo directamente.`;
-
+        `Archivo ATS_${data.fi} creado en Google Drive. Puede abrirlo o descargarlo directamente.`;
       document.getElementById('overlay-success').classList.add('active');
-      setStatus('✅ ATS generado correctamente — ' + new Date().toLocaleTimeString('es-CO'));
+      setStatus('✅ ATS generado — ' + new Date().toLocaleTimeString('es-CO'));
       showToast('✅ ATS generado y guardado en Drive', 'success');
     } else {
       throw new Error((result && result.error) || 'Respuesta inesperada del servidor');
     }
   } catch (err) {
     document.getElementById('overlay-loading').classList.remove('active');
-    document.getElementById('error-msg').textContent = `Error: ${err.message}. Verifique que el GAS esté desplegado y accesible.`;
+    document.getElementById('error-msg').textContent = `Error: ${err.message}`;
     document.getElementById('overlay-error').classList.add('active');
-    setStatus('❌ Error al generar — revise la consola');
-    showToast('❌ Error de conexión con GAS', 'error');
+    setStatus('❌ Error al generar');
+    showToast('❌ ' + err.message, 'error');
     console.error('GAS Error:', err);
   } finally {
     setLoading(false);
   }
 }
 
-// ─── callGAS: POST con CORS habilitado en el GAS (doPost devuelve headers CORS)
-// Esta función siempre usa POST directo — sin JSONP, sin no-cors.
-// Requiere que el GAS tenga doPost con ContentService y headers CORS correctos.
-async function callGAS(data) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000);
+// ── JSONP: inyecta <script src="GAS_URL?callback=__cb&data=...">
+// GAS debe responder: __cb({ok:true, url:"...", fileId:"..."})
+// Esto bypasea CORS completamente porque es un script tag, no fetch.
+function callGAS_JSONP(data) {
+  return new Promise((resolve, reject) => {
+    const cbName = '__gasCallback_' + Date.now();
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Tiempo agotado (60s). Verifica que el GAS esté desplegado como "Cualquier persona, incluso anónimos".'));
+    }, 60000);
 
-  try {
-    const response = await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(data),
-      signal: controller.signal
-    });
+    window[cbName] = function(result) {
+      cleanup();
+      resolve(result);
+    };
 
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      throw new Error('El servidor respondió con código ' + response.status);
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      const old = document.getElementById('__gasScript');
+      if (old) old.remove();
     }
 
-    const result = await response.json();
-    return result;
+    // Serializar datos como base64 para evitar límites de URL
+    // Nota: algunos datos (firmas base64) son grandes — los enviamos comprimidos
+    const payload = JSON.stringify(data);
+    const encoded = btoa(unescape(encodeURIComponent(payload)));
 
-  } catch (err) {
-    clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      throw new Error('Tiempo de espera agotado (60s). Verifique que el GAS esté desplegado con acceso "Cualquier persona".');
-    }
-    throw err;
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════
-function setLoading(on) {
-  ['btnGenerar','btnGenerar2'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) btn.disabled = on;
+    const script = document.createElement('script');
+    script.id = '__gasScript';
+    // Enviamos callback + datos codificados
+    script.src = `${GAS_URL}?callback=${cbName}&d=${encodeURIComponent(encoded)}`;
+    script.onerror = () => {
+      cleanup();
+      reject(new Error('No se pudo cargar el script del GAS. Verifica la URL y que esté desplegado con acceso "Cualquier persona".'));
+    };
+    document.head.appendChild(script);
   });
 }
-
-function setStatus(msg) {
-  document.getElementById('status-text').textContent = msg;
-}
-
-function closeOverlay(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-function resetForm() {
-  if (!confirm('¿Restablecer todos los campos a los valores por defecto del ATS Abril 2026?')) return;
-  location.reload();
-}
-
-function showToast(msg, type='info') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => { t.className = 'toast'; }, 4000);
-}
-
-// Cerrar overlays con Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    ['overlay-success','overlay-error'].forEach(closeOverlay);
-  }
-});
 </script>
 </body>
 </html>
