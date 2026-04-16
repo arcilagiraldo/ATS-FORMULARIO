@@ -548,11 +548,11 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
 
 <!-- OVERLAY ERROR -->
 <div class="overlay" id="overlay-error">
-  <div class="modal">
-    <div class="modal-icon">❌</div>
-    <h2>Error al Generar</h2>
-    <p id="error-msg">Ocurrió un problema al conectar con Google Apps Script.</p>
-    <div class="modal-actions">
+  <div class="modal" style="max-width:500px;text-align:left">
+    <div class="modal-icon" style="text-align:center">❌</div>
+    <h2 style="text-align:center">Error al Generar</h2>
+    <pre id="error-msg" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted);white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:20px;max-height:220px;overflow-y:auto">Ocurrió un problema al conectar con Google Apps Script.</pre>
+    <div class="modal-actions" style="justify-content:center">
       <button class="btn btn-primary" onclick="closeOverlay('overlay-error');generarATS()">Reintentar</button>
       <button class="btn btn-ghost" onclick="closeOverlay('overlay-error')">Cerrar</button>
     </div>
@@ -580,17 +580,29 @@ Pausas activas. ATS. Auto cuidado y demás disposiciones SST necesarias.</textar
 
 <!-- OVERLAY CONFIG GAS URL -->
 <div class="overlay" id="overlay-gas-config">
-  <div class="modal" style="max-width:560px;text-align:left">
+  <div class="modal" style="max-width:580px;text-align:left">
     <div class="modal-icon" style="text-align:center">⚙️</div>
-    <h2 style="text-align:center;margin-bottom:8px">URL de Google Apps Script</h2>
-    <p style="text-align:center">Pega aquí la URL que te da Google al desplegar el GAS.<br>Se guarda automáticamente en este navegador.</p>
-    <div style="display:grid;gap:8px;margin-bottom:20px">
+    <h2 style="text-align:center;margin-bottom:4px">URL de Google Apps Script</h2>
+    <p style="text-align:center;margin-bottom:16px">Pega aquí la URL que te da Google al desplegar el GAS.</p>
+    <div style="display:grid;gap:8px;margin-bottom:16px">
       <label style="font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace">URL del Web App</label>
-      <input id="gas-url-input" type="text" placeholder="https://script.google.com/macros/s/..." style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:10px 14px;width:100%">
-      <p style="font-size:11px;color:var(--text-dim);margin:0">📌 En Apps Script: <strong style="color:var(--text-muted)">Implementar → Administrar implementaciones → URL del Web App</strong></p>
+      <input id="gas-url-input" type="text" placeholder="https://script.google.com/macros/s/AKfy.../exec" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:10px 14px;width:100%">
     </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:11px;color:var(--text-muted);line-height:1.7">
+      <strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace">📋 PASOS PARA OBTENER LA URL:</strong><br>
+      1. Abre <a href="https://script.google.com" target="_blank" style="color:var(--blue)">script.google.com</a> → Abre el proyecto GAS<br>
+      2. Clic en <strong style="color:var(--text)">Implementar</strong> → <strong style="color:var(--text)">Nueva implementación</strong><br>
+      3. Tipo: <strong style="color:var(--text)">Aplicación web</strong><br>
+      4. Ejecutar como: <strong style="color:var(--text)">Yo (tu cuenta)</strong><br>
+      5. Quién tiene acceso: <strong style="color:var(--accent)">Cualquier persona, incluso anónimos</strong><br>
+      6. Clic <strong style="color:var(--text)">Implementar</strong> → Copia la <strong style="color:var(--text)">URL del Web App</strong><br>
+      <br>
+      <strong style="color:var(--danger)">⚠️ Si ya existe:</strong> Implementar → Administrar implementaciones → Editar → Nueva versión → Actualizar
+    </div>
+    <div id="gas-test-result" style="display:none;font-size:12px;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-family:'IBM Plex Mono',monospace"></div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="saveGasUrl()">💾 Guardar y probar</button>
+      <button class="btn btn-primary" onclick="saveGasUrl()">💾 Guardar</button>
+      <button class="btn btn-secondary" onclick="testGasFromModal()">🔌 Probar conexión</button>
       <button class="btn btn-ghost" onclick="document.getElementById('overlay-gas-config').classList.remove('active')">Cancelar</button>
     </div>
   </div>
@@ -607,24 +619,53 @@ let GAS_URL = localStorage.getItem('gas_url') || '';
 
 function openGasConfig() {
   document.getElementById('gas-url-input').value = GAS_URL;
+  const res = document.getElementById('gas-test-result');
+  if (res) res.style.display = 'none';
   document.getElementById('overlay-gas-config').classList.add('active');
 }
 function saveGasUrl() {
   const newUrl = document.getElementById('gas-url-input').value.trim();
-  if (!newUrl.includes('script.google.com')) {
-    alert('La URL no parece válida. Debe contener script.google.com');
+  if (!newUrl || !newUrl.includes('script.google.com')) {
+    showGasTestResult('error', '⚠ La URL no parece válida. Debe contener script.google.com y terminar en /exec');
     return;
+  }
+  if (!newUrl.endsWith('/exec') && !newUrl.includes('/exec?')) {
+    showGasTestResult('warn', '⚠ La URL debería terminar en /exec — ¿copiaste la URL correcta del Web App?');
   }
   GAS_URL = newUrl;
   localStorage.setItem('gas_url', GAS_URL);
   document.getElementById('overlay-gas-config').classList.remove('active');
   testGasConnection();
+  showToast('✅ URL guardada', 'success');
 }
 
-// ── Verificar conexión usando no-cors (solo detecta si hay red, no CORS)
+function showGasTestResult(type, msg) {
+  const el = document.getElementById('gas-test-result');
+  if (!el) return;
+  el.style.display = 'block';
+  const colors = { ok:'#10b981', error:'#ef4444', warn:'#f59e0b', loading:'#60a5fa' };
+  el.style.background = type === 'ok' ? 'rgba(16,185,129,0.1)' : type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
+  el.style.border = `1px solid ${colors[type]||colors.warn}`;
+  el.style.color = colors[type] || '#e8eaf0';
+  el.textContent = msg;
+}
+
+async function testGasFromModal() {
+  const url = document.getElementById('gas-url-input').value.trim();
+  if (!url) { showGasTestResult('error', '⚠ Ingresa la URL primero'); return; }
+  showGasTestResult('loading', '⏳ Probando conexión...');
+  try {
+    await fetch(url + '?ping=1', { method: 'GET', mode: 'no-cors' });
+    showGasTestResult('ok', '✅ Conexión exitosa — el GAS responde. Guarda la URL.');
+  } catch(e) {
+    showGasTestResult('error', '❌ Sin respuesta — verifica URL y que el GAS esté desplegado como "Cualquier persona".');
+  }
+}
+
+// ── Verificar conexión al cargar la página
 async function testGasConnection() {
   if (!GAS_URL) {
-    setConnStatus('orange', '⚠ Configura la URL del GAS → ⚙ URL GAS');
+    setConnStatus('#f59e0b', '⚠ Configura URL del GAS → ⚙ URL GAS');
     return;
   }
   setConnStatus('#f59e0b', 'Verificando GAS...');
@@ -632,7 +673,7 @@ async function testGasConnection() {
     await fetch(GAS_URL + '?ping=1', { method: 'GET', mode: 'no-cors' });
     setConnStatus('#10b981', 'GAS accesible ✓');
   } catch(e) {
-    setConnStatus('#ef4444', 'Sin red — revisa conexión');
+    setConnStatus('#ef4444', 'Sin red o GAS inaccesible');
   }
 }
 function setConnStatus(color, text) {
@@ -1008,12 +1049,11 @@ function collectData() {
   };
 }
 
-// ═══════════════════════════════════════════════════════
-// GENERAR ATS — JSONP (solución definitiva anti-CORS)
-// El HTML envía datos via parámetro GET + callback JSONP.
-// El GAS responde: callback({...})
-// Esto evita completamente el problema CORS.
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// GENERAR ATS
+// Estrategia: JSONP con payload comprimido (sin firmas en base64 en URL).
+// Las firmas se envían como texto indicativo; las imágenes son opcionales.
+// ═══════════════════════════════════════════════════════════════════
 async function generarATS() {
   if (!GAS_URL) {
     showToast('⚠️ Primero configura la URL del GAS — botón ⚙ URL GAS', 'error');
@@ -1031,7 +1071,23 @@ async function generarATS() {
   setStatus('Enviando datos al GAS...');
 
   try {
-    const result = await callGAS_JSONP(data);
+    // Separar firmas del payload principal para no sobrepasar límite URL
+    const firmas = {
+      firma_sst_img: data.firma_sst_img || null,
+      firma_ing_img: data.firma_ing_img || null,
+      firma_enc_img: data.firma_enc_img || null,
+      workers_firmas: (data.workers || []).map(w => w.firma || null),
+    };
+    // Payload liviano (sin imágenes base64)
+    const dataSinFirmas = Object.assign({}, data, {
+      firma_sst_img: firmas.firma_sst_img ? '__FIRMA_SST__' : null,
+      firma_ing_img: firmas.firma_ing_img ? '__FIRMA_ING__' : null,
+      firma_enc_img: firmas.firma_enc_img ? '__FIRMA_ENC__' : null,
+      workers: (data.workers || []).map((w, i) => Object.assign({}, w, { firma: null })),
+    });
+
+    const result = await callGAS_JSONP(dataSinFirmas);
+
     document.getElementById('overlay-loading').classList.remove('active');
 
     if (result && (result.url || result.ok)) {
@@ -1041,19 +1097,26 @@ async function generarATS() {
         ? `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`
         : (result.download || '#');
       document.getElementById('success-msg').textContent =
-        `Archivo ATS_${data.fi} creado en Google Drive. Puede abrirlo o descargarlo directamente.`;
+        `Archivo "${result.nombre || 'ATS_' + data.fi}" creado en Google Drive.`;
       document.getElementById('overlay-success').classList.add('active');
       setStatus('✅ ATS generado — ' + new Date().toLocaleTimeString('es-CO'));
       showToast('✅ ATS generado y guardado en Drive', 'success');
     } else {
-      throw new Error((result && result.error) || 'Respuesta inesperada del servidor');
+      throw new Error((result && result.error) || 'Respuesta inesperada del servidor GAS');
     }
   } catch (err) {
     document.getElementById('overlay-loading').classList.remove('active');
-    document.getElementById('error-msg').textContent = `Error: ${err.message}`;
+    // Mensaje de error amigable y diagnóstico
+    let msgExtra = '';
+    if (err.message.includes('script') || err.message.includes('cargar')) {
+      msgExtra = '\n\n🔧 Diagnóstico:\n1. Verifica que la URL del GAS sea correcta (⚙ URL GAS)\n2. El GAS debe estar desplegado con acceso "Cualquier persona"\n3. En Apps Script: Implementar → Nueva implementación → Tipo: Aplicación web → Acceso: Cualquier persona';
+    } else if (err.message.includes('TEMPLATE_ID')) {
+      msgExtra = '\n\n🔧 El TEMPLATE_ID en el GAS no está configurado correctamente. Debes pegar el ID del Google Sheets nativo "ATS".';
+    }
+    document.getElementById('error-msg').textContent = `Error: ${err.message}${msgExtra}`;
     document.getElementById('overlay-error').classList.add('active');
     setStatus('❌ Error al generar');
-    showToast('❌ ' + err.message, 'error');
+    showToast('❌ ' + err.message.substring(0, 80), 'error');
     console.error('GAS Error:', err);
   } finally {
     setLoading(false);
@@ -1061,25 +1124,23 @@ async function generarATS() {
 }
 
 // ── Codificación base64 UTF-8 correcta (soporta tildes, ñ, caracteres especiales)
-// El GAS decodifica con Utilities.base64Decode(..., UTF_8) — este método es compatible.
 function base64EncodeUTF8(str) {
-  // TextEncoder produce bytes UTF-8 correctos
   const bytes = new TextEncoder().encode(str);
   let binary = '';
   bytes.forEach(b => binary += String.fromCharCode(b));
   return btoa(binary);
 }
 
-// ── JSONP: inyecta <script src="GAS_URL?callback=__cb&data=...">
-// GAS debe responder: __cb({ok:true, url:"...", fileId:"..."})
-// Esto bypasea CORS completamente porque es un script tag, no fetch.
+// ── JSONP: inyecta <script src="GAS_URL?callback=__cb&d=BASE64_DATOS">
+// GAS responde: __cb({ok:true, url:"...", fileId:"...", nombre:"..."})
+// Esto bypasea CORS completamente. Timeout de 90s para GAS lento.
 function callGAS_JSONP(data) {
   return new Promise((resolve, reject) => {
     const cbName = '__gasCallback_' + Date.now();
     const timeout = setTimeout(() => {
       cleanup();
-      reject(new Error('Tiempo agotado (60s). Verifica que el GAS esté desplegado como "Cualquier persona, incluso anónimos".'));
-    }, 60000);
+      reject(new Error('Tiempo agotado (90s). El GAS tardó demasiado o no está accesible. Verifica el despliegue.'));
+    }, 90000);
 
     window[cbName] = function(result) {
       cleanup();
@@ -1093,18 +1154,19 @@ function callGAS_JSONP(data) {
       if (old) old.remove();
     }
 
-    // Serializar datos como base64 UTF-8 correcto
-    // Usamos TextEncoder + Uint8Array → base64 para manejar tildes y ñ correctamente
-    const payload = JSON.stringify(data);
-    const encoded = base64EncodeUTF8(payload);
-
-    const script = document.createElement('script');
-    script.id = '__gasScript';
-    // Enviamos callback + datos codificados
-    script.src = `${GAS_URL}?callback=${cbName}&d=${encodeURIComponent(encoded)}`;
+    const payload  = JSON.stringify(data);
+    const encoded  = base64EncodeUTF8(payload);
+    const script   = document.createElement('script');
+    script.id      = '__gasScript';
+    script.src     = `${GAS_URL}?callback=${cbName}&d=${encodeURIComponent(encoded)}`;
     script.onerror = () => {
       cleanup();
-      reject(new Error('No se pudo cargar el script del GAS. Verifica la URL y que esté desplegado con acceso "Cualquier persona".'));
+      reject(new Error(
+        'No se pudo cargar el script del GAS. ' +
+        'Verifica: (1) URL correcta en ⚙ URL GAS, ' +
+        '(2) GAS desplegado con acceso "Cualquier persona, incluso anónimos", ' +
+        '(3) En Apps Script hiciste "Nueva implementación" después del último cambio.'
+      ));
     };
     document.head.appendChild(script);
   });
