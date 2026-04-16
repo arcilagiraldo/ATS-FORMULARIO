@@ -1060,6 +1060,16 @@ async function generarATS() {
   }
 }
 
+// ── Codificación base64 UTF-8 correcta (soporta tildes, ñ, caracteres especiales)
+// El GAS decodifica con Utilities.base64Decode(..., UTF_8) — este método es compatible.
+function base64EncodeUTF8(str) {
+  // TextEncoder produce bytes UTF-8 correctos
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
 // ── JSONP: inyecta <script src="GAS_URL?callback=__cb&data=...">
 // GAS debe responder: __cb({ok:true, url:"...", fileId:"..."})
 // Esto bypasea CORS completamente porque es un script tag, no fetch.
@@ -1083,10 +1093,10 @@ function callGAS_JSONP(data) {
       if (old) old.remove();
     }
 
-    // Serializar datos como base64 para evitar límites de URL
-    // Nota: algunos datos (firmas base64) son grandes — los enviamos comprimidos
+    // Serializar datos como base64 UTF-8 correcto
+    // Usamos TextEncoder + Uint8Array → base64 para manejar tildes y ñ correctamente
     const payload = JSON.stringify(data);
-    const encoded = btoa(unescape(encodeURIComponent(payload)));
+    const encoded = base64EncodeUTF8(payload);
 
     const script = document.createElement('script');
     script.id = '__gasScript';
